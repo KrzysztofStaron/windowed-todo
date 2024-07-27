@@ -191,8 +191,8 @@ const TaskWindow = ({
     });
   }, [mousePosition]);
 
-  const addTask = (name: string) => {
-    tasksDispatch({ type: TaskActions.ADD, payload: createTask(name) });
+  const addTask = (task: Task) => {
+    tasksDispatch({ type: TaskActions.ADD, payload: task });
   };
 
   const removeTask = (id: number) => {
@@ -244,7 +244,10 @@ const TaskWindow = ({
             dispatch={(args: any) => tasksDispatch(args)}
           />
         ))}
-        <div className="w-full h-7 rounded-lg bg-zinc-900 flex items-center justify-center text-white text-2xl hover:bg-zinc-800 cursor-pointer">
+        <div
+          className="w-full h-7 rounded-lg bg-zinc-900 flex items-center justify-center text-white text-2xl hover:bg-zinc-800 cursor-pointer"
+          onClick={(e) => addTask(createTask("Red", "red"))}
+        >
           <IoMdAddCircleOutline />
         </div>
       </div>
