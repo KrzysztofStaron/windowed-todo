@@ -1,113 +1,170 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import React, { useEffect, useReducer, useRef, useState } from "react";
+import { FaCheck } from "react-icons/fa";
+import { IoIosCheckmark, IoMdCheckmark } from "react-icons/io";
+
+type Task = {
+  name: string;
+  done: boolean;
+  color: string;
+};
+
+enum TaskActions {
+  ADD,
+  REMOVE,
+  STATUS,
+}
+
+const tasksReducer = (
+  state: Task[],
+  action: {
+    type: TaskActions;
+    payload: any;
+    index?: number;
+  }
+) => {
+  switch (action.type) {
+    case TaskActions.ADD:
+      return [...state, action.payload];
+    case TaskActions.REMOVE:
+      return state.filter((_, index) => index !== action.payload);
+    case TaskActions.STATUS:
+      return state.map((task, index) => {
+        if (index === action.payload) {
+          return { ...task, done: !task.done };
+        }
+        return task;
+      });
+    default:
+      return state;
+  }
+};
+
+const Home = () => {
+  const createTask = (name: string, color = ""): Task => {
+    return { name: name, done: false, color: color };
+  };
+
+  const [tasks, tasksDispatch] = useReducer(tasksReducer, [
+    createTask("Handle double click ahoy przygodo asssss", "yellow"),
+    createTask("I'm Blue", "blue"),
+    createTask("I'm Red", "red"),
+  ]);
+
+  const addTask = (name: string) => {
+    tasksDispatch({ type: TaskActions.ADD, payload: createTask(name) });
+  };
+
+  const removeTask = (id: number) => {
+    tasksDispatch({ type: TaskActions.REMOVE, payload: id });
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <div className="w-screen h-screen ">
+      <TaskContainer
+        containerId={0}
+        tasks={tasks}
+        tasksDispatch={tasksDispatch}
+      />
+    </div>
+  );
+};
+
+const TaskComponent = ({
+  task,
+  index,
+  dispatch,
+}: {
+  task: Task;
+  index: number;
+  dispatch: CallableFunction;
+}) => {
+  const [activated, setActivated] = React.useState(false);
+
+  useEffect(() => {
+    dispatch({ type: TaskActions.STATUS, payload: index });
+  }, [activated]);
+
+  return (
+    <div
+      className={`flex task items-center cursor-pointer bg-zinc-800 transition-all rounded-lg border-2 gap-2 p-1 justify-between ${
+        task.done || `${task.color}`
+      }`}
+      onDoubleClick={(e) => {
+        if (!task.done) {
+          setActivated(!activated);
+        }
+      }}
+    >
+      <p
+        className={`w-80 text-center transition-all font-bold mx-1 ${
+          task.done ? "text-zinc-500" : "text-white"
+        }`}
+        style={{ userSelect: "none" }}
+      >
+        {task.name}
+      </p>
+
+      <button
+        onClick={() => setActivated(!activated)}
+        className={`flex items-center justify-center transition-all text-black h-5 w-5  ${
+          activated
+            ? `${task.color} rounded-md`
+            : `bg-white rounded-sm ${task.color}_h`
+        }`}
+      >
+        <h1 className="text-2xl">{activated ? <IoIosCheckmark /> : null}</h1>
+      </button>
+    </div>
+  );
+};
+
+const TaskContainer = ({
+  containerId,
+  tasks,
+  tasksDispatch,
+}: {
+  containerId: number;
+  tasks: Task[];
+  tasksDispatch: CallableFunction;
+}) => {
+  return (
+    <div className="window flex flex-col">
+      <div className="text-white bg-zinc-800 h-6 flex items-center justify-between px-2 rounded-t-md cursor-grab">
+        <b>Title:</b>
+        <div className="flex gap-1">
+          <button className="rounded-full bg-yellow-400 h-4 w-4"></button>
+          <button className="rounded-full bg-red-700 h-4 w-4"></button>
         </div>
       </div>
-
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      <div className="flex flex-col gap-3 border-zinc-800 border-x-4 border-b-4 p-2 pt-3 rounded-b-md h-full">
+        {tasks.map((task, index) => (
+          <TaskComponent
+            key={index}
+            task={task}
+            index={index}
+            dispatch={(args: any) => tasksDispatch(args)}
+          />
+        ))}
       </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    </div>
   );
-}
+};
+
+/*
+const Child = React.forwardRef((props, ref) => {
+  useImperativeHandle(ref, () => ({
+    childMethod() {
+      ooo();
+    },
+  }));
+
+  function ooo() {
+    console.log("call me");
+  }
+
+  return <></>;
+});
+*/
+export default Home;

@@ -2,32 +2,95 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+/*
+.checkBox {
+  width: 0.75rem;
+  height: 0.75rem;
+  background-color: white;
+  border: 1px solid;
+  @apply border-zinc-950;
+  color: black;
+  transition: all 0.3s ease;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+.checkBox:hover {
+  @apply bg-gray-400;
+}
+
+.checkBox.active {
+  @apply bg-yellow-500;
+  transition: all 0.5s ease;
+}
+
+.checkBox.active:hover {
+  @apply bg-yellow-400;
+}
+ 
+
+p:hover {
+  color: black;
+  animation: pulse 1s alternate;
+}
+
+@keyframes pulse {
+  0% {
+    color: orange;
+  }
+  100% {
+    color: black;
   }
 }
+ */
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+.wrapper {
+  background: linear-gradient(#fbbf24, #fde047),
+    linear-gradient(to right, #fbbf24, #fde047);
+  background-origin: padding-box, border-box;
+  background-repeat: no-repeat; /* this is important */
+  border: 2px solid transparent;
+  border-radius: 0.25rem;
+  width: fit-content;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+.window {
+  width: fit-content;
+}
+
+.task {
+  border-color: transparent;
+}
+
+.blue:hover {
+  @apply border-cyan-400;
+}
+
+.red:hover {
+  @apply border-red-500;
+}
+
+.yellow:hover {
+  @apply border-yellow-400;
+}
+
+button.blue {
+  @apply bg-cyan-400;
+}
+
+button.yellow {
+  @apply bg-yellow-400;
+}
+
+button.red {
+  @apply bg-red-500;
+}
+
+.yellow_h {
+  @apply bg-yellow-200;
+}
+
+.blue_h {
+  @apply bg-blue-200;
+}
+.red_h {
+  @apply bg-red-200;
 }
