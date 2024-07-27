@@ -1,6 +1,6 @@
 "use client";
 
-import React, { use, useEffect, useReducer, useRef, useState } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import { FaCheck } from "react-icons/fa";
 import {
   IoIosCheckmark,
@@ -60,10 +60,6 @@ const TaskComponent = ({
 }) => {
   const [activated, setActivated] = React.useState(false);
 
-  useEffect(() => {
-    dispatch({ type: TaskActions.STATUS, payload: index });
-  }, [activated]);
-
   return (
     <div
       className={`flex task items-center cursor-pointer bg-zinc-800 transition-all rounded-lg border-2 gap-2 p-1 justify-between ${
@@ -72,6 +68,7 @@ const TaskComponent = ({
       onDoubleClick={(e) => {
         if (!task.done) {
           setActivated(!activated);
+          dispatch({ type: TaskActions.STATUS, payload: index });
         }
       }}
     >
@@ -85,7 +82,10 @@ const TaskComponent = ({
       </p>
 
       <button
-        onClick={() => setActivated(!activated)}
+        onClick={() => {
+          setActivated(!activated);
+          dispatch({ type: TaskActions.STATUS, payload: index });
+        }}
         className={`flex items-center justify-center transition-all text-black h-5 w-5  ${
           activated
             ? `${task.color} rounded-md`
@@ -154,7 +154,7 @@ const TaskWindow = ({
   mousePosition: { x: number; y: number };
   defTasks: Task[];
   startingName: string;
-  openTaskWindow: (openTask: Task) => Task;
+  openTaskWindow: (containerId: number) => void;
 }) => {
   const [windowName, setWindowName] = useState(startingName);
 
@@ -246,7 +246,7 @@ const TaskWindow = ({
         ))}
         <div
           className="w-full h-7 rounded-lg bg-zinc-900 flex items-center justify-center text-white text-2xl hover:bg-zinc-800 cursor-pointer"
-          onClick={(e) => addTask(createTask("Red", "red"))}
+          onClick={(e) => openTaskWindow(containerId)}
         >
           <IoMdAddCircleOutline />
         </div>

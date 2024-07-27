@@ -6,8 +6,8 @@ import TaskWindow, { createTask, Task } from "./TaskWindow";
 const Home = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-  const openTaskWindow = (): Task => {
-    return createTask("Hello", "red");
+  const openTaskWindow = (containerId: number) => {
+    console.log("open: " + containerId);
   };
 
   return (
