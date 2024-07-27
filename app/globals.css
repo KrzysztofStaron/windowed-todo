@@ -53,7 +53,7 @@ p:hover {
 }
 
 .window {
-  width: fit-content;
+  height: fit-content;
 }
 
 .task {
