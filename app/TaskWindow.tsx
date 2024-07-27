@@ -20,6 +20,7 @@ enum TaskActions {
   ADD,
   REMOVE,
   STATUS,
+  UPDATE,
 }
 
 const tasksReducer = (
@@ -39,6 +40,13 @@ const tasksReducer = (
       return state.map((task, index) => {
         if (index === action.payload) {
           return { ...task, done: !task.done };
+        }
+        return task;
+      });
+    case TaskActions.UPDATE:
+      return state.map((task, index) => {
+        if (index === action.index) {
+          return action.payload;
         }
         return task;
       });
@@ -154,7 +162,7 @@ const TaskWindow = ({
   mousePosition: { x: number; y: number };
   defTasks: Task[];
   startingName: string;
-  openTaskWindow: (containerId: number) => void;
+  openTaskWindow: (callback: CallableFunction) => void;
 }) => {
   const [windowName, setWindowName] = useState(startingName);
 
@@ -246,7 +254,7 @@ const TaskWindow = ({
         ))}
         <div
           className="w-full h-7 rounded-lg bg-zinc-900 flex items-center justify-center text-white text-2xl hover:bg-zinc-800 cursor-pointer"
-          onClick={(e) => openTaskWindow(containerId)}
+          onClick={(e) => openTaskWindow((args: any) => tasksDispatch(args))}
         >
           <IoMdAddCircleOutline />
         </div>

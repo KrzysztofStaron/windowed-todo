@@ -1,13 +1,14 @@
 "use client";
 
-import { useReducer, useState } from "react";
+import { useReducer, useRef, useState } from "react";
 import TaskWindow, { createTask, Task } from "./TaskWindow";
 
 const Home = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const editCallback = useRef<CallableFunction>();
 
-  const openTaskWindow = (containerId: number) => {
-    console.log("open: " + containerId);
+  const openTaskWindow = (callback: CallableFunction) => {
+    editCallback.current = callback;
   };
 
   return (
@@ -28,7 +29,7 @@ const Home = () => {
           createTask("I'm Red", "red"),
         ]}
       />
-      <div className="absolute bottom-0 h-10  bg-zinc-800"></div>
+      <div className="absolute bottom-0 h-10 w-full bg-zinc-800">Ass</div>
     </div>
   );
 };
