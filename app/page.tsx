@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useReducer, useState } from "react";
 import TaskWindow, { createTask, Task } from "./TaskWindow";
 
 const Home = () => {
@@ -26,19 +26,6 @@ const Home = () => {
           createTask("I'm Yellow", "yellow"),
           createTask("I'm Blue", "blue"),
           createTask("I'm Red", "red"),
-        ]}
-      />
-
-      <TaskWindow
-        mousePosition={mousePosition}
-        containerId={1}
-        startingName={"Todo"}
-        openTaskWindow={openTaskWindow}
-        defTasks={[
-          createTask("Integrate", "blue"),
-          createTask("Debug", "blue"),
-          createTask("Make cup", "blue"),
-          createTask("Kill water", "blue"),
         ]}
       />
       <div className="absolute bottom-0 h-10  bg-zinc-800"></div>
