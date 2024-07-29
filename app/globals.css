@@ -77,7 +77,11 @@ button.blue {
 }
 
 button.yellow {
-  @apply bg-yellow-400;
+  @apply bg-yellow-300;
+}
+
+button.white {
+  @apply bg-white;
 }
 
 button.red {
@@ -93,4 +97,55 @@ button.red {
 }
 .red_h {
   @apply bg-red-200;
+}
+
+.white:hover {
+  @apply border-white;
+}
+
+body {
+  background: linear-gradient(#09090b, #030712);
+}
+
+.taskBarApp:hover {
+  background-color: #333333;
+}
+
+.taskBarAppClosed {
+  background-color: #1f1f21;
+  animation-name: pulseUp;
+  animation-duration: 0.4s;
+}
+
+@keyframes pulseUp {
+  0% {
+    background-color: #27272a;
+  }
+  10% {
+    background-color: #3f3f46;
+  }
+  100% {
+    background-color: #1f1f21;
+  }
+}
+
+.taskBarApp {
+  animation-name: pulseDown;
+  animation-duration: 0.2s;
+}
+
+@keyframes pulseDown {
+  0% {
+    background-color: #1f1f21;
+  }
+  10% {
+    background-color: black;
+  }
+  100% {
+    background-color: #333333;
+  }
+}
+
+.taskBarAppClosed:hover {
+  background-color: #222212;
 }

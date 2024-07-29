@@ -1,6 +1,14 @@
 "use client";
 
-import React, { useEffect, useReducer, useRef, useState } from "react";
+import { open } from "fs/promises";
+import React, {
+  use,
+  useEffect,
+  useImperativeHandle,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import { FaCheck } from "react-icons/fa";
 import {
   IoIosCheckmark,
@@ -16,7 +24,7 @@ export type Task = {
   color: string;
 };
 
-enum TaskActions {
+export enum TaskActions {
   ADD,
   REMOVE,
   STATUS,
@@ -35,7 +43,7 @@ const tasksReducer = (
     case TaskActions.ADD:
       return [...state, action.payload];
     case TaskActions.REMOVE:
-      return state.filter((_, index) => index !== action.payload);
+      return state.filter((_, index) => index !== action.index);
     case TaskActions.STATUS:
       return state.map((task, index) => {
         if (index === action.payload) {
@@ -55,28 +63,51 @@ const tasksReducer = (
   }
 };
 
-const TaskComponent = ({
+export const TaskComponent = ({
   task,
   index,
   dispatch,
   isDragging,
+  openTaskWindow,
+  windowId,
+  tasks,
+  active,
+  cancelSelection,
 }: {
   task: Task;
   index: number;
   dispatch: CallableFunction;
   isDragging: boolean;
+  openTaskWindow: CallableFunction;
+  windowId: number;
+  tasks: Task[];
+  active: boolean;
+  cancelSelection: CallableFunction;
 }) => {
   const [activated, setActivated] = React.useState(false);
 
   return (
     <div
-      className={`flex task items-center cursor-pointer bg-zinc-800 transition-all rounded-lg border-2 gap-2 p-1 justify-between ${
+      className={`flex task items-center cursor-pointer mb-3 ${
+        active ? "bg-zinc-600" : "bg-zinc-800"
+      } transition-all rounded-lg border-2 gap-2 p-1 justify-between ${
         task.done || isDragging || `${task.color}`
-      }`}
+      } ${task.done ? "order-3" : "order-1"}`}
       onDoubleClick={(e) => {
         if (!task.done) {
           setActivated(!activated);
           dispatch({ type: TaskActions.STATUS, payload: index });
+        }
+        cancelSelection();
+      }}
+      onClick={(e) => {
+        if (active) {
+          cancelSelection();
+        } else if (
+          (e.target as HTMLElement)?.tagName !== "BUTTON" &&
+          (e.target as HTMLElement)?.tagName !== "svg"
+        ) {
+          openTaskWindow(tasks, index, windowId);
         }
       }}
     >
@@ -100,13 +131,15 @@ const TaskComponent = ({
             : `bg-white rounded-sm ${task.color}_h`
         }`}
       >
-        <h1 className="text-2xl">{activated ? <IoIosCheckmark /> : null}</h1>
+        <h1 className="text-2xl" id="check">
+          {activated ? <IoIosCheckmark /> : null}
+        </h1>
       </button>
     </div>
   );
 };
 
-const WindowTitle = ({
+export const WindowTitle = ({
   editing,
   setEditing,
   windowName,
@@ -147,135 +180,180 @@ const WindowTitle = ({
   );
 };
 
-export const createTask = (name: string, color = ""): Task => {
+const createTask = (name: string, color = ""): Task => {
   return { name: name, done: false, color: color };
 };
 
-const TaskWindow = ({
-  containerId,
-  mousePosition,
-  defTasks,
-  startingName,
-  openTaskWindow,
-}: {
-  containerId: number;
-  mousePosition: { x: number; y: number };
-  defTasks: Task[];
-  startingName: string;
-  openTaskWindow: (callback: CallableFunction) => void;
-}) => {
-  const [windowName, setWindowName] = useState(startingName);
-
-  const [tasks, tasksDispatch] = useReducer(tasksReducer, defTasks);
-
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const [position, setPosition] = useState(
-    JSON.parse(
-      localStorage.getItem("taskWindowPosition" + containerId) || ""
-    ) || {
-      x: 0,
-      y: 0,
+const TaskWindow = React.forwardRef(
+  (
+    {
+      containerId: windowId,
+      mousePosition,
+      defTasks,
+      startingName,
+      openTaskWindow,
+      activeIndex,
+      updateLength,
+      cancelSelection,
+      visible,
+      minimalise,
+    }: {
+      containerId: number;
+      mousePosition: { x: number; y: number };
+      defTasks: Task[];
+      startingName: string;
+      openTaskWindow: (tasks: Task[], index: number, windowID: number) => void;
+      activeIndex?: number;
+      updateLength: CallableFunction;
+      cancelSelection: CallableFunction;
+      visible: boolean;
+      minimalise: CallableFunction;
+    },
+    ref
+  ) => {
+    if (!visible) {
+      return <></>;
     }
-  );
-  const [editing, setEditing] = useState(false);
 
-  const [isDragging, setIsDragging] = useState(false);
+    const [windowName, setWindowName] = useState(startingName);
 
-  useEffect(() => {
-    localStorage.setItem(
-      "taskWindowPosition" + containerId,
-      JSON.stringify(position)
-    );
-  }, [position]);
+    useImperativeHandle(ref, () => ({
+      handleDispatch(args: any) {
+        handleDispatch(args);
+      },
+    }));
 
-  useEffect(() => {
-    if (!isDragging) return;
-    setPosition({
-      x: mousePosition.x + offset.x,
-      y: Math.min(
-        mousePosition.y + offset.y,
-        window.innerHeight - BOTTOM_MARGIN
-      ),
+    function handleDispatch(args: any) {
+      tasksDispatch(args);
+      if (args.type === TaskActions.REMOVE) {
+        console.log(tasks);
+        openTaskWindow(
+          tasks.filter((_, index) => index !== args.index),
+          args.index,
+          windowId
+        );
+      }
+    }
+
+    const [tasks, tasksDispatch] = useReducer(tasksReducer, defTasks);
+
+    const [offset, setOffset] = useState({ x: 0, y: 0 });
+
+    const [position, setPosition] = useState(() => {
+      if (localStorage.getItem("taskWindowPosition" + windowId)) {
+        return JSON.parse(
+          localStorage.getItem("taskWindowPosition" + windowId)!
+        );
+      } else {
+        return { x: 0, y: 0 };
+      }
     });
-  }, [mousePosition]);
 
-  const addTask = (task: Task) => {
-    tasksDispatch({ type: TaskActions.ADD, payload: task });
-  };
+    const [editing, setEditing] = useState(false);
 
-  const removeTask = (id: number) => {
-    tasksDispatch({ type: TaskActions.REMOVE, payload: id });
-  };
+    const [isDragging, setIsDragging] = useState(false);
 
-  return (
-    <div
-      className="window flex flex-col fixed"
-      style={{
-        left: position.x,
-        top: Math.min(window.innerHeight - BOTTOM_MARGIN, position.y),
-      }}
-    >
-      {/* Header */}
+    useEffect(() => {
+      updateLength(tasks.length, windowId);
+    }, [tasks]);
+
+    useEffect(() => {
+      localStorage.setItem(
+        "taskWindowPosition" + windowId,
+        JSON.stringify(position)
+      );
+    }, [position]);
+
+    useEffect(() => {
+      if (!isDragging) return;
+      setPosition({
+        x: mousePosition.x + offset.x,
+        y: Math.min(
+          mousePosition.y + offset.y,
+          window.innerHeight - BOTTOM_MARGIN
+        ),
+      });
+    }, [mousePosition]);
+
+    const addTask = (task: Task) => {
+      tasksDispatch({ type: TaskActions.ADD, payload: task });
+    };
+
+    return (
       <div
-        className="text-white bg-zinc-800 h-6 flex items-center justify-between px-2 rounded-t-md cursor-grab w-full gap-4"
-        onMouseDown={(e) => {
-          if (!editing) {
-            setOffset({ x: position.x - e.clientX, y: position.y - e.clientY });
-            setIsDragging(true);
-          }
-        }}
-        onMouseUp={(e) => {
-          setIsDragging(false);
+        className="window flex flex-col fixed"
+        style={{
+          left: position.x,
+          top: Math.min(window.innerHeight - BOTTOM_MARGIN, position.y),
+          width: 400,
         }}
       >
-        <WindowTitle
-          editing={editing}
-          setEditing={setEditing}
-          windowName={windowName}
-          setWindowName={setWindowName}
-        />
-
-        <div className="flex gap-1.5">
-          <button className="rounded-full bg-yellow-400 h-3.5 w-3.5"></button>
-          <button className="rounded-full bg-red-700 h-3.5 w-3.5"></button>
-        </div>
-      </div>
-
-      {/* Body + Border */}
-      <div className="flex flex-col gap-3 border-zinc-800 border-x-4 border-b-4 p-2 pt-3 rounded-b-md h-full">
-        {tasks.map((task, index) => (
-          <TaskComponent
-            key={index}
-            task={task}
-            isDragging={isDragging}
-            index={index}
-            dispatch={(args: any) => tasksDispatch(args)}
-          />
-        ))}
+        {/* Header */}
         <div
-          className="w-full h-7 rounded-lg bg-zinc-900 flex items-center justify-center text-white text-2xl hover:bg-zinc-800 cursor-pointer"
-          onClick={(e) => openTaskWindow((args: any) => tasksDispatch(args))}
+          className="text-white bg-zinc-800 h-6 flex items-center justify-between px-2 rounded-t-md cursor-grab w-full gap-4 "
+          onMouseDown={(e) => {
+            if (!editing) {
+              setOffset({
+                x: position.x - e.clientX,
+                y: position.y - e.clientY,
+              });
+              setIsDragging(true);
+            }
+          }}
+          onMouseUp={(e) => {
+            setIsDragging(false);
+          }}
         >
-          <IoMdAddCircleOutline />
+          <WindowTitle
+            editing={editing}
+            setEditing={setEditing}
+            windowName={windowName}
+            setWindowName={setWindowName}
+          />
+
+          <div className="flex gap-1.5">
+            <button
+              className="rounded-full bg-yellow-400 h-3.5 w-3.5"
+              onClick={() => minimalise()}
+            ></button>
+          </div>
+        </div>
+
+        {/* Body + Border */}
+        <div className="flex flex-col border-zinc-800 border-x-4 border-b-4 p-2.5 rounded-b-md h-full">
+          {tasks.map((task, index) => (
+            <TaskComponent
+              cancelSelection={cancelSelection}
+              windowId={windowId}
+              openTaskWindow={openTaskWindow}
+              key={index}
+              task={task}
+              tasks={tasks}
+              isDragging={isDragging}
+              index={index}
+              dispatch={(args: any) => tasksDispatch(args)}
+              active={activeIndex === index ?? false}
+            />
+          ))}
+          {tasks.some((e) => e.done) && tasks.some((e) => !e.done) ? (
+            <div className="w-full h-1 bg-zinc-700 order-2 mb-3 rounded-lg"></div>
+          ) : null}
+          <div
+            className="w-full h-7 rounded-lg bg-zinc-900 flex items-center justify-center text-white text-2xl hover:bg-zinc-800 cursor-pointer order-4"
+            onClick={(e) => {
+              addTask(createTask("New Task", "white"));
+              openTaskWindow(
+                [...tasks, createTask("New Task", "white")],
+                tasks.length,
+                windowId
+              );
+            }}
+          >
+            <IoMdAddCircleOutline />
+          </div>
         </div>
       </div>
-    </div>
-  );
-};
-
-/*
-const Child = React.forwardRef((props, ref) => {
-  useImperativeHandle(ref, () => ({
-    childMethod() {
-      ooo();
-    },
-  }));
-
-  function ooo() {
-    console.log("call me");
+    );
   }
-
-  return <></>;
-});
-*/
+);
 export default TaskWindow;
