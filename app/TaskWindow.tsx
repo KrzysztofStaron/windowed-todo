@@ -139,12 +139,7 @@ export const TaskComponent = ({
   );
 };
 
-export const WindowTitle = ({
-  editing,
-  setEditing,
-  windowName,
-  setWindowName,
-}: any) => {
+export const WindowTitle = ({ editing, setEditing, windowName }: any) => {
   return (
     <>
       <button
@@ -164,15 +159,15 @@ export const WindowTitle = ({
             <input
               type="text"
               className="font-bold w-full bg-transparent h-6 outline-none truncate overflow-hidden"
-              value={windowName}
-              onChange={(e) => setWindowName(e.target.value)}
+              value={windowName.get}
+              onChange={(e) => windowName.set(e.target.value.replace(/:$/, ""))}
               onBlur={() => setEditing(false)}
               autoFocus
             />
           </>
         ) : (
           <p className="font-bold" style={{ userSelect: "none" }}>
-            {windowName + ":"}
+            {windowName.get + ":"}
           </p>
         )}
       </button>
@@ -190,33 +185,25 @@ const TaskWindow = React.forwardRef(
       containerId: windowId,
       mousePosition,
       defTasks,
-      startingName,
+      windowName,
       openTaskWindow,
       activeIndex,
       updateLength,
       cancelSelection,
-      visible,
       minimalise,
     }: {
       containerId: number;
       mousePosition: { x: number; y: number };
       defTasks: Task[];
-      startingName: string;
+      windowName: { get: string; set: (v: string) => void };
       openTaskWindow: (tasks: Task[], index: number, windowID: number) => void;
       activeIndex?: number;
       updateLength: CallableFunction;
       cancelSelection: CallableFunction;
-      visible: boolean;
       minimalise: CallableFunction;
     },
     ref
   ) => {
-    if (!visible) {
-      return <></>;
-    }
-
-    const [windowName, setWindowName] = useState(startingName);
-
     useImperativeHandle(ref, () => ({
       handleDispatch(args: any) {
         handleDispatch(args);
@@ -308,7 +295,6 @@ const TaskWindow = React.forwardRef(
             editing={editing}
             setEditing={setEditing}
             windowName={windowName}
-            setWindowName={setWindowName}
           />
 
           <div className="flex gap-1.5">

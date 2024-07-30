@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { TaskList } from "./page";
+import { HiOutlinePlus } from "react-icons/hi";
 
 type TaskBarApp = {
   name: string;
@@ -34,14 +35,12 @@ const TaskBarApp = ({
 const TaskBar = ({
   windows,
   changeVisibility,
+  newWindow,
 }: {
   windows: TaskList[];
   changeVisibility: (visible: boolean, id: number) => void;
+  newWindow: () => void;
 }) => {
-  useEffect(() => {
-    console.log(windows.length);
-  }, [windows]);
-
   return (
     <div className="absolute bottom-0 h-12 w-full bg-zinc-950 flex gap-2 border-t-2 border-zinc-600 p-1">
       {windows.map((window, index) => (
@@ -52,6 +51,13 @@ const TaskBar = ({
           visible={window.visible}
         />
       ))}
+      <button
+        className={`
+         bg-zinc-800 text-gray-100 taskBarApp h-9 flex items-center justify-center hover:text-white w-9 font-bold rounded-lg `}
+        onClick={(e) => newWindow()}
+      >
+        <HiOutlinePlus />
+      </button>
     </div>
   );
 };

@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Task Management Application
 
-## Getting Started
+This project is a task management application built using React and TypeScript. It allows users to create, edit, and manage tasks within multiple windows. The application features a dynamic taskbar, draggable task windows, and persistent state management using local storage.
 
-First, run the development server:
+## File Structure
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **TaskBar.tsx**: Component responsible for rendering the taskbar and managing window visibility.
+- **TaskWindow.tsx**: Component representing individual task windows.
+- **Page.tsx**: Main component that integrates all other components and manages the overall state of the application.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Components
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### TaskBar
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+The TaskBar component is responsible for displaying the taskbar at the bottom of the screen. It allows users to toggle the visibility of task windows and create new windows.
 
-## Learn More
+#### Props
 
-To learn more about Next.js, take a look at the following resources:
+- `windows`: Array of `TaskList` objects representing the current windows.
+- `changeVisibility`: Function to change the visibility of a window.
+- `newWindow`: Function to create a new window.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### TaskWindow
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+The TaskWindow component represents an individual task window. It displays tasks and allows users to edit or delete them.
 
-## Deploy on Vercel
+#### Props
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `ref`: Reference to the window element.
+- `mousePosition`: Current mouse position.
+- `containerId`: ID of the window container.
+- `windowName`: Object containing getter and setter for the window name.
+- `openTaskWindow`: Function to open a task window.
+- `defTasks`: Default tasks for the window.
+- `activeIndex`: Index of the currently active task.
+- `updateLength`: Function to update the length of the task list.
+- `cancelSelection`: Function to cancel the current selection.
+- `minimalise`: Function to minimize the window.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+### App
+
+The App component is the main component of the application. It manages the state of the tasks, windows, handles mouse events, and renders the TaskBar and TaskWindow components.
+
+#### State
+
+- `mousePosition`: Current mouse position.
+- `windowRefs`: Array of references to the window elements.
+- `lengths`: Array of lengths of the task lists, used to bulletproof editing window.
+- `windows`: Array of `TaskList` objects representing the current windows.
+- `editingTasks`: Array of tasks currently being edited.
+- `editingIndex`: Index of the task currently being edited.
+- `windowID`: ID of the currently active window.
+
+#### Functions
+
+- `updateLength(value: number, window: number)`: Updates the length of the task list for a specific window.
+- `cancelSelection()`: Cancels the current selection (used by `EditWindow`).
+- `openTaskWindow(tasks: Task[], index: number, windowID: number)`: Opens a task in **EditWindow**
+- `createTask(name: string, color = ""): Task`: Creates a new task with the specified name and color.
+
+### EditWindow
+
+The EditWindow component is responsible for rendering the task editing interface. It allows users to edit the name and color of a task and delete tasks.
+
+#### Props
+
+- `myRef`: Reference to the window element.
+- `task`: Task object being edited.
+- `index`: Index of the task being edited.
+- `mousePosition`: Current mouse position.
+- `windowId`: ID of the window containing the task.
+- `lengths`: Array of lengths of the task lists.
