@@ -44,12 +44,12 @@ The App component is the main component of the application. It manages the state
 #### State
 
 - `mousePosition`: Current mouse position.
-- `windowRefs`: Array of references to the window elements.
+- `windowRefs`: Array of references to the window elements, it length setermines the max number of active windows not counting the EditWindow
 - `lengths`: Array of lengths of the task lists, used to bulletproof editing window.
-- `windows`: Array of `TaskList` objects representing the current windows.
+- `windows`: Array of `TaskList` objects representing the current windows. **Upon change it automaticly sets first window visiblity to false if number of visible windows exceeds the length of windowRefs**
 - `editingTasks`: Array of tasks currently being edited.
 - `editingIndex`: Index of the task currently being edited.
-- `windowID`: ID of the currently active window.
+- `windowID`: ID of window of the currently edited task.
 
 #### Functions
 
@@ -60,7 +60,7 @@ The App component is the main component of the application. It manages the state
 
 ### EditWindow
 
-The EditWindow component is responsible for rendering the task editing interface. It allows users to edit the name and color of a task and delete tasks.
+The EditWindow component is responsible for rendering the task editing interface. It allows users to edit the name and color of a task and delete it.
 
 #### Props
 

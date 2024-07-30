@@ -283,7 +283,7 @@ const EditWindow = ({
         <WindowTitle
           editing={false}
           setEditing={() => {}}
-          windowName={"Manage Task"}
+          windowName={{ get: "Manage Task", set: (v: string) => {} }}
           setWindowName={() => {}}
         />
 
