@@ -23,6 +23,7 @@ The TaskBar component is responsible for displaying the taskbar at the bottom of
 ### TaskWindow
 
 The TaskWindow component represents an individual task window. It displays tasks and allows users to edit or delete them.
+It's index in **windowRefs** is termined by `relativeIndex`: windowsId and visibility formated into continous indexes
 
 #### Props
 
@@ -61,7 +62,6 @@ The App component is the main component of the application. It manages the state
 ### EditWindow
 
 The EditWindow component is responsible for rendering the task editing interface. It allows users to edit the name and color of a task and delete it.
-It's index in **windowRefs** is termined by `relativeIndex`: windowsId and visibility formated into continous indexes
 
 #### Props
 
