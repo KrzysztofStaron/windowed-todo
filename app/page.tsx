@@ -7,39 +7,34 @@ import TaskBar from "./TaskBar";
 
 export type TaskList = {
   name: string;
-  tasks: Task[];
   id: number;
   visible: boolean;
   deleted: boolean;
 };
 
 const App = () => {
+  const [loading, setLoading] = useState(true);
+
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const windowRefs = [useRef(), useRef(), useRef(), useRef()];
   const [lengths, setLengths] = useState([0, 0, 0]);
-  const [windows, setWindows] = useState<TaskList[]>([
-    {
-      tasks: [
-        createTask("Yellow", "yellow"),
-        createTask("Blue", "blue"),
-        createTask("Red", "red"),
-      ],
-      name: "Colors",
-      id: 0,
-      visible: true,
-      deleted: false,
-    },
-    {
-      tasks: [],
-      name: "A very long window title",
-      id: 1,
-      visible: true,
-      deleted: false,
-    },
-  ]);
+  const [windows, setWindows] = useState<TaskList[]>([]);
+
+  useEffect(() => {
+    if (loading) return;
+    localStorage.setItem("windows", JSON.stringify(windows));
+  }, [windows]);
+
+  useEffect(() => {
+    let win = JSON.parse(localStorage.getItem("windows") ?? "[]").filter(
+      (e: any) => !e.deleted
+    );
+    setWindows(win);
+    setLoading(false);
+  }, []);
 
   const [editingTasks, setEditingTasks] = useState<Task[]>([
-    createTask("Test", "-1"),
+    createTask("", "-1"),
   ]);
   const [editingIndex, setEditingIndex] = useState<number>(0);
   const [windowID, setWindowId] = useState<number>(-1);
@@ -155,7 +150,6 @@ const App = () => {
                 },
               }}
               openTaskWindow={openTaskWindow}
-              defTasks={window.tasks}
               activeIndex={windowID === index ? editingIndex : -1}
               updateLength={updateLength}
               cancelSelection={cancelSelection}
@@ -172,6 +166,8 @@ const App = () => {
                     i == index ? { ...prev[i], tasks: [], deleted: true } : w
                   );
                 });
+                localStorage.removeItem(`tasks${index}`);
+                localStorage.removeItem(`taskWindowPosition${index}`);
               }}
             />
           );
@@ -200,7 +196,7 @@ const App = () => {
               {
                 tasks: [],
                 name: "New window",
-                id: prev[prev.length - 1].id + 1,
+                id: (prev[prev.length - 1]?.id ?? -1) + 1,
                 visible: true,
                 deleted: false,
               },
@@ -310,7 +306,7 @@ const EditWindow = ({
         className="flex flex-col border-zinc-800 border-x-4 border-b-4 p-2 pt-3 rounded-b-md justify-between"
         style={{ height: 400 }}
       >
-        {task && lengths[windowId] > index ? (
+        {task && task.color != "-1" ? (
           <>
             <div className="w-full flex flex-col items-center">
               <label className="text-white">Name: </label>

@@ -184,7 +184,6 @@ const TaskWindow = React.forwardRef(
     {
       windowId,
       mousePosition,
-      defTasks,
       windowName,
       openTaskWindow,
       activeIndex,
@@ -195,7 +194,6 @@ const TaskWindow = React.forwardRef(
     }: {
       windowId: number;
       mousePosition: { x: number; y: number };
-      defTasks: Task[];
       windowName: { get: string; set: (v: string) => void };
       openTaskWindow: (tasks: Task[], index: number, windowID: number) => void;
       activeIndex?: number;
@@ -224,7 +222,14 @@ const TaskWindow = React.forwardRef(
       }
     }
 
-    const [tasks, tasksDispatch] = useReducer(tasksReducer, defTasks);
+    const [tasks, tasksDispatch] = useReducer(
+      tasksReducer,
+      JSON.parse(localStorage.getItem("tasks" + windowId)!) ?? []
+    );
+
+    useEffect(() => {
+      localStorage.setItem("tasks" + windowId, JSON.stringify(tasks));
+    }, [tasks]);
 
     const [offset, setOffset] = useState({ x: 0, y: 0 });
 
