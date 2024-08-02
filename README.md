@@ -1,3 +1,8 @@
+# How to run?
+
+`npm install`
+`npm run dev`
+
 # Task Management Application
 
 This project is a task management application built using React and TypeScript. It allows users to create, edit, and manage tasks within multiple windows. The application features a dynamic taskbar, draggable task windows, and persistent state management using local storage.
