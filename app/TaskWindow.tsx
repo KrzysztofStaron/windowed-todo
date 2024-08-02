@@ -182,7 +182,7 @@ const createTask = (name: string, color = ""): Task => {
 const TaskWindow = React.forwardRef(
   (
     {
-      containerId: windowId,
+      windowId,
       mousePosition,
       defTasks,
       windowName,
@@ -191,8 +191,9 @@ const TaskWindow = React.forwardRef(
       updateLength,
       cancelSelection,
       minimalise,
+      remove,
     }: {
-      containerId: number;
+      windowId: number;
       mousePosition: { x: number; y: number };
       defTasks: Task[];
       windowName: { get: string; set: (v: string) => void };
@@ -201,6 +202,7 @@ const TaskWindow = React.forwardRef(
       updateLength: CallableFunction;
       cancelSelection: CallableFunction;
       minimalise: CallableFunction;
+      remove: CallableFunction;
     },
     ref
   ) => {
@@ -301,6 +303,10 @@ const TaskWindow = React.forwardRef(
             <button
               className="rounded-full bg-yellow-400 h-3.5 w-3.5"
               onClick={() => minimalise()}
+            ></button>
+            <button
+              className="rounded-full bg-red-500 h-3.5 w-3.5"
+              onClick={() => remove()}
             ></button>
           </div>
         </div>

@@ -53,6 +53,12 @@ const App = () => {
     setEditingIndex(index);
     setEditingTasks(tasks);
     setWindowId(windowID);
+
+    console.log(
+      `index: ${index}, windowID: ${windowID}, tasks: ${tasks.map(
+        (t) => t.name
+      )}`
+    );
   };
 
   useEffect(() => {
@@ -132,9 +138,9 @@ const App = () => {
           return (
             <TaskWindow
               ref={windowRefs[relativeIndex.get(index)!]}
-              key={index}
+              key={window.id}
               mousePosition={mousePosition}
-              containerId={index}
+              windowId={index}
               windowName={{
                 get: window.name,
                 set: (name: string) => {
@@ -157,6 +163,11 @@ const App = () => {
                   )
                 )
               }
+              remove={() => {
+                setWindows((prev) => {
+                  return prev.filter((_, i) => i !== index);
+                });
+              }}
             />
           );
         })}
@@ -184,7 +195,7 @@ const App = () => {
               {
                 tasks: [],
                 name: "New window",
-                id: prev.length,
+                id: prev[prev.length - 1].id + 1,
                 visible: true,
               },
             ]);
@@ -194,7 +205,7 @@ const App = () => {
     </div>
   );
 };
-
+// used for Hardcoding
 const createTask = (name: string, color = ""): Task => {
   return { name: name, done: false, color: color };
 };
@@ -261,6 +272,14 @@ const EditWindow = ({
     });
   }, [name, color]);
 
+  useEffect(() => {
+    console.log("lengths[windowId]", lengths[windowId]);
+    console.log(
+      "task && lengths[windowId] > index ",
+      lengths[windowId] > index
+    );
+  }, [task && lengths[windowId]]);
+
   return (
     <div
       className="flex flex-col fixed"
@@ -286,10 +305,6 @@ const EditWindow = ({
           windowName={{ get: "Manage Task", set: (v: string) => {} }}
           setWindowName={() => {}}
         />
-
-        <div className="flex gap-1.5">
-          <button className="rounded-full bg-yellow-400 h-3.5 w-3.5"></button>
-        </div>
       </div>
 
       {/* Body + Border */}
