@@ -17,6 +17,27 @@ This project is a task management application built using React and TypeScript. 
 
 ## Components
 
+### App
+
+The App component is the main component of the application. It manages the state of the tasks, windows, handles mouse events, and renders the TaskBar and TaskWindow components.
+
+#### State
+
+- `mousePosition`: Current mouse position.
+- `windowRefs`: Array of references to the window elements, it length setermines the max number of active windows not counting the EditWindow
+- `lengths`: Array of lengths of the task lists, used to bulletproof editing window.
+- `windows`: Array of `TaskList` objects representing the current windows. **Upon change it automaticly sets first window visiblity to false if number of visible windows exceeds the length of windowRefs**
+- `editingTasks`: Array of tasks currently being edited.
+- `editingIndex`: Index of the task currently being edited.
+- `windowID`: ID of window of the currently edited task.
+
+#### Functions
+
+- `updateLength(value: number, window: number)`: Updates the length of the task list for a specific window.
+- `cancelSelection()`: Cancels the current selection (used by `EditWindow`).
+- `openTaskWindow(tasks: Task[], index: number, windowID: number)`: Opens a task in **EditWindow**
+- `createTask(name: string, color = ""): Task`: Creates a new task with the specified name and color.
+
 ### TaskBar
 
 The TaskBar component is responsible for displaying the taskbar at the bottom of the screen. It allows users to toggle the visibility of task windows and create new windows.
@@ -44,27 +65,7 @@ It's index in **windowRefs** is termined by `relativeIndex`: windowsId and visib
 - `updateLength`: Function to update the length of the task list.
 - `cancelSelection`: Function to cancel the current selection.
 - `minimalise`: Function to minimize the window.
-
-### App
-
-The App component is the main component of the application. It manages the state of the tasks, windows, handles mouse events, and renders the TaskBar and TaskWindow components.
-
-#### State
-
-- `mousePosition`: Current mouse position.
-- `windowRefs`: Array of references to the window elements, it length setermines the max number of active windows not counting the EditWindow
-- `lengths`: Array of lengths of the task lists, used to bulletproof editing window.
-- `windows`: Array of `TaskList` objects representing the current windows. **Upon change it automaticly sets first window visiblity to false if number of visible windows exceeds the length of windowRefs**
-- `editingTasks`: Array of tasks currently being edited.
-- `editingIndex`: Index of the task currently being edited.
-- `windowID`: ID of window of the currently edited task.
-
-#### Functions
-
-- `updateLength(value: number, window: number)`: Updates the length of the task list for a specific window.
-- `cancelSelection()`: Cancels the current selection (used by `EditWindow`).
-- `openTaskWindow(tasks: Task[], index: number, windowID: number)`: Opens a task in **EditWindow**
-- `createTask(name: string, color = ""): Task`: Creates a new task with the specified name and color.
+- `remove`: Function to mark a window as removed, TaskWindow is relly removed only after full page reload
 
 ### EditWindow
 
@@ -77,4 +78,3 @@ The EditWindow component is responsible for rendering the task editing interface
 - `index`: Index of the task being edited.
 - `mousePosition`: Current mouse position.
 - `windowId`: ID of the window containing the task.
-- `lengths`: Array of lengths of the task lists.

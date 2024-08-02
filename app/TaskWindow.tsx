@@ -187,7 +187,6 @@ const TaskWindow = React.forwardRef(
       windowName,
       openTaskWindow,
       activeIndex,
-      updateLength,
       cancelSelection,
       minimalise,
       remove,
@@ -197,7 +196,6 @@ const TaskWindow = React.forwardRef(
       windowName: { get: string; set: (v: string) => void };
       openTaskWindow: (tasks: Task[], index: number, windowID: number) => void;
       activeIndex?: number;
-      updateLength: CallableFunction;
       cancelSelection: CallableFunction;
       minimalise: CallableFunction;
       remove: CallableFunction;
@@ -246,10 +244,6 @@ const TaskWindow = React.forwardRef(
     const [editing, setEditing] = useState(false);
 
     const [isDragging, setIsDragging] = useState(false);
-
-    useEffect(() => {
-      updateLength(tasks.length, windowId);
-    }, [tasks]);
 
     useEffect(() => {
       localStorage.setItem(

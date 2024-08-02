@@ -17,7 +17,6 @@ const App = () => {
 
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const windowRefs = [useRef(), useRef(), useRef(), useRef()];
-  const [lengths, setLengths] = useState([0, 0, 0]);
   const [windows, setWindows] = useState<TaskList[]>([]);
 
   useEffect(() => {
@@ -38,10 +37,6 @@ const App = () => {
   ]);
   const [editingIndex, setEditingIndex] = useState<number>(0);
   const [windowID, setWindowId] = useState<number>(-1);
-
-  const updateLength = (value: number, window: number) => {
-    setLengths((prev) => prev.map((l, i) => (i === window ? value : l)));
-  };
 
   const cancelSelection = () => {
     setEditingIndex(-1);
@@ -128,8 +123,6 @@ const App = () => {
           index={editingIndex}
           task={editingTasks[editingIndex]}
           mousePosition={mousePosition}
-          windowId={windowID}
-          lengths={lengths}
         />
         {windows.map((window, index) => {
           if (!window.visible || window.deleted) return null;
@@ -151,7 +144,6 @@ const App = () => {
               }}
               openTaskWindow={openTaskWindow}
               activeIndex={windowID === index ? editingIndex : -1}
-              updateLength={updateLength}
               cancelSelection={cancelSelection}
               minimalise={() =>
                 setWindows((prev) =>
@@ -217,15 +209,11 @@ const EditWindow = ({
   task,
   index,
   mousePosition,
-  windowId,
-  lengths,
 }: {
   windowRef: any;
   task: Task;
   index: number;
   mousePosition: any;
-  windowId: number;
-  lengths: number[];
 }) => {
   const [name, setName] = useState(task?.name ?? "");
   const [color, setColor] = useState(task?.color ?? "-1");
