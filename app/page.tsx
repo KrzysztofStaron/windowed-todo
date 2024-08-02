@@ -10,6 +10,7 @@ export type TaskList = {
   tasks: Task[];
   id: number;
   visible: boolean;
+  deleted: boolean;
 };
 
 const App = () => {
@@ -26,12 +27,14 @@ const App = () => {
       name: "Colors",
       id: 0,
       visible: true,
+      deleted: false,
     },
     {
       tasks: [],
       name: "A very long window title",
       id: 1,
       visible: true,
+      deleted: false,
     },
   ]);
 
@@ -134,7 +137,7 @@ const App = () => {
           lengths={lengths}
         />
         {windows.map((window, index) => {
-          if (!window.visible) return null;
+          if (!window.visible || window.deleted) return null;
           return (
             <TaskWindow
               ref={windowRefs[relativeIndex.get(index)!]}
@@ -165,7 +168,9 @@ const App = () => {
               }
               remove={() => {
                 setWindows((prev) => {
-                  return prev.filter((_, i) => i !== index);
+                  return prev.map((w, i) =>
+                    i == index ? { ...prev[i], tasks: [], deleted: true } : w
+                  );
                 });
               }}
             />
@@ -197,6 +202,7 @@ const App = () => {
                 name: "New window",
                 id: prev[prev.length - 1].id + 1,
                 visible: true,
+                deleted: false,
               },
             ]);
           }}
@@ -271,14 +277,6 @@ const EditWindow = ({
       payload: { name: name, done: false, color: color },
     });
   }, [name, color]);
-
-  useEffect(() => {
-    console.log("lengths[windowId]", lengths[windowId]);
-    console.log(
-      "task && lengths[windowId] > index ",
-      lengths[windowId] > index
-    );
-  }, [task && lengths[windowId]]);
 
   return (
     <div

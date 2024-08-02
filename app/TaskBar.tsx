@@ -43,14 +43,17 @@ const TaskBar = ({
 }) => {
   return (
     <div className="absolute bottom-0 h-12 w-full bg-zinc-950 flex gap-2 border-t-2 border-zinc-600 p-1">
-      {windows.map((window, index) => (
-        <TaskBarApp
-          key={index}
-          app={{ name: window.name, id: window.id } as TaskBarApp}
-          changeVisibility={changeVisibility}
-          visible={window.visible}
-        />
-      ))}
+      {windows.map((window, index) => {
+        if (window.deleted) return null;
+        return (
+          <TaskBarApp
+            key={index}
+            app={{ name: window.name, id: window.id } as TaskBarApp}
+            changeVisibility={changeVisibility}
+            visible={window.visible}
+          />
+        );
+      })}
       <button
         className={`
          bg-zinc-800 text-gray-100 taskBarApp h-9 flex items-center justify-center hover:text-white w-9 font-bold rounded-lg `}
