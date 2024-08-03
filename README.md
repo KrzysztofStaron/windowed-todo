@@ -73,7 +73,7 @@ The EditWindow component is responsible for rendering the task editing interface
 
 #### Props
 
-- `myRef`: Reference to the window element.
+- `windowRef`: Reference to the window element.
 - `task`: Task object being edited.
 - `index`: Index of the task being edited.
 - `mousePosition`: Current mouse position.
