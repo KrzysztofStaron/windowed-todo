@@ -78,18 +78,15 @@ export const TaskComponent = ({
   active: boolean;
   cancelSelection: CallableFunction;
 }) => {
-  const [activated, setActivated] = React.useState(false);
-
   return (
     <div
-      className={`flex task items-center cursor-pointer mb-3 ${
+      className={`flex task items-center cursor-pointer ${
         active ? "bg-zinc-600" : "bg-zinc-800"
       } transition-all rounded-lg border-2 gap-2 p-1 justify-between ${
         task.done || isDragging || `${task.color}`
-      } ${task.done ? "order-3" : "order-1"}`}
+      } ${task.done ? "order-2 opacity-80" : "order-1"}`}
       onDoubleClick={(e) => {
         if (!task.done) {
-          setActivated(!activated);
           dispatch({ type: TaskActions.STATUS, payload: index });
         }
         cancelSelection();
@@ -116,17 +113,16 @@ export const TaskComponent = ({
 
       <button
         onClick={() => {
-          setActivated(!activated);
           dispatch({ type: TaskActions.STATUS, payload: index });
         }}
         className={`flex items-center justify-center transition-all text-black h-5 w-5  ${
-          activated
+          task.done
             ? `${task.color} rounded-md`
             : `bg-white rounded-sm ${task.color}_h`
         }`}
       >
         <h1 className="text-2xl" id="check">
-          {activated ? <IoIosCheckmark /> : null}
+          {task.done ? <IoIosCheckmark /> : null}
         </h1>
       </button>
     </div>
@@ -202,9 +198,20 @@ const TaskWindow = React.forwardRef(
       handleDispatch(args: any) {
         handleDispatch(args);
       },
+      handleMinimalise() {
+        handleMinimalise();
+      },
     }));
 
-    function handleDispatch(args: any) {
+    const handleMinimalise = () => {
+      windowRef.current?.classList.add("minimalize");
+      windowRef.current?.classList.remove("showWindow");
+      setTimeout(() => {
+        minimalise();
+      }, 200);
+    };
+
+    const handleDispatch = function (args: any) {
       tasksDispatch(args);
       if (args.type === TaskActions.REMOVE) {
         console.log(tasks);
@@ -214,7 +221,7 @@ const TaskWindow = React.forwardRef(
           windowId
         );
       }
-    }
+    };
 
     const [tasks, tasksDispatch] = useReducer(
       tasksReducer,
@@ -284,7 +291,7 @@ const TaskWindow = React.forwardRef(
     return (
       <div
         ref={windowRef}
-        className="window flex flex-col fixed"
+        className="window flex flex-col fixed showWindow"
         style={{
           left: position.x,
           top: Math.min(window.innerHeight - BOTTOM_MARGIN, position.y),
@@ -316,7 +323,7 @@ const TaskWindow = React.forwardRef(
           <div className="flex gap-1.5">
             <button
               className="rounded-full bg-yellow-400 h-3.5 w-3.5"
-              onClick={() => minimalise()}
+              onClick={() => handleMinimalise()}
             ></button>
             <button
               className="rounded-full bg-red-500 h-3.5 w-3.5"
@@ -326,27 +333,27 @@ const TaskWindow = React.forwardRef(
         </div>
 
         {/* Body + Border */}
-        <div className="flex flex-col border-zinc-800 border-x-4 border-b-4 p-2.5 rounded-b-md h-full tasksContainer overflow-scroll">
+        <div className="flex flex-col border-zinc-800 border-x-4 border-b-4 rounded-b-md h-full pb-2.5 items-center">
           {/* Map Tasks */}
-          {tasks.map((task, index) => (
-            <TaskComponent
-              cancelSelection={cancelSelection}
-              windowId={windowId}
-              openTaskWindow={openTaskWindow}
-              key={index}
-              task={task}
-              tasks={tasks}
-              isDragging={isDragging}
-              index={index}
-              dispatch={(args: any) => tasksDispatch(args)}
-              active={activeIndex === index ?? false}
-            />
-          ))}
-          {tasks.some((e) => e.done) && tasks.some((e) => !e.done) ? (
-            <div className="w-full h-1 bg-zinc-700 order-2 mb-3 rounded-lg"></div>
-          ) : null}
+          <div className="flex flex-col tasksContainer overflow-scroll gap-3 px-2.5 mb-2.5 mt-2.5 overflow-x-hidden">
+            {tasks.map((task, index) => (
+              <TaskComponent
+                cancelSelection={cancelSelection}
+                windowId={windowId}
+                openTaskWindow={openTaskWindow}
+                key={index}
+                task={task}
+                tasks={tasks}
+                isDragging={isDragging}
+                index={index}
+                dispatch={(args: any) => tasksDispatch(args)}
+                active={activeIndex === index ?? false}
+              />
+            ))}
+          </div>
+
           <div
-            className="w-full h-7 rounded-lg bg-zinc-900 flex items-center justify-center text-white text-2xl hover:bg-zinc-800 cursor-pointer order-4"
+            className="h-8 rounded-lg bg-zinc-800 flex items-center justify-center text-white text-2xl hover:bg-zinc-700 cursor-pointer order-4 newTaskButton"
             onClick={(e) => {
               addTask(createTask("New Task", "white"));
               openTaskWindow(

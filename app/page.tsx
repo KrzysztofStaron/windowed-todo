@@ -13,16 +13,26 @@ export type TaskList = {
 };
 
 const App = () => {
+  const [windows, setWindows] = useState<TaskList[]>([]);
+
   const [loading, setLoading] = useState(true);
 
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const windowRefs: React.MutableRefObject<any>[] = [
     useRef(),
     useRef(),
     useRef(),
     useRef(),
   ];
-  const [windows, setWindows] = useState<TaskList[]>([]);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  const [editingTasks, setEditingTasks] = useState<Task[]>([
+    createTask("", "-1"),
+  ]);
+  const [editingIndex, setEditingIndex] = useState<number>(0);
+  const [windowID, setWindowId] = useState<number>(-1);
+
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [deleteWindowId, setDeleteWindowId] = useState<number>(-1);
 
   useEffect(() => {
     if (loading) return;
@@ -36,12 +46,6 @@ const App = () => {
     setWindows(win);
     setLoading(false);
   }, []);
-
-  const [editingTasks, setEditingTasks] = useState<Task[]>([
-    createTask("", "-1"),
-  ]);
-  const [editingIndex, setEditingIndex] = useState<number>(0);
-  const [windowID, setWindowId] = useState<number>(-1);
 
   const cancelSelection = () => {
     setEditingIndex(-1);
@@ -73,6 +77,11 @@ const App = () => {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && showConfirmation === true) {
+        handleConfirm();
+      }
+    });
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
@@ -114,94 +123,137 @@ const App = () => {
     );
   }, [windows]);
 
+  const handleConfirm = () => {
+    setWindows((prev) => {
+      return prev.map((w, i) =>
+        i == deleteWindowId ? { ...prev[i], tasks: [], deleted: true } : w
+      );
+    });
+    localStorage.removeItem(`tasks${deleteWindowId}`);
+    localStorage.removeItem(`taskWindowPosition${deleteWindowId}`);
+
+    setShowConfirmation(false);
+  };
+
   return (
-    <div
-      className="w-screen h-screen"
-      id="cancel-selection"
-      onMouseMove={(e) => {
-        setMousePosition({ x: e.clientX, y: e.clientY });
-      }}
-    >
-      <div>
-        <EditWindow
-          windowRef={windowRefs[relativeIndex.get(windowID)!]}
-          index={editingIndex}
-          task={editingTasks[editingIndex]}
-          mousePosition={mousePosition}
-        />
-        {windows.map((window, index) => {
-          if (!window.visible || window.deleted) return null;
-          return (
-            <TaskWindow
-              ref={windowRefs[relativeIndex.get(index)!]}
-              key={window.id}
-              mousePosition={mousePosition}
-              windowId={index}
-              windowName={{
-                get: window.name,
-                set: (name: string) => {
+    <>
+      {showConfirmation ? (
+        <div className="w-screen h-screen flex items-center justify-center absolute z-50 bg-opacity-60 bg-black">
+          <div className="bg-zinc-800 text-white p-4 rounded-md">
+            <h1 className="text-lg mb-4 font-semibold">
+              Are you sure you want to delete this task?
+            </h1>
+            <div className="flex gap-4 justify-center">
+              <button
+                className="bg-red-500 hover:bg-red-400 text-white px-4 py-1 rounded-md"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleConfirm();
+                  }
+                }}
+                onClick={() => {
+                  handleConfirm();
+                }}
+              >
+                Yes
+              </button>
+              <button
+                className="bg-green-500 hover:bg-green-400 text-white px-4 py-1 rounded-md"
+                onClick={() => setShowConfirmation(false)}
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+      <div
+        className="w-screen h-screen"
+        id="cancel-selection"
+        onMouseMove={(e) => {
+          setMousePosition({ x: e.clientX, y: e.clientY });
+        }}
+      >
+        <div>
+          <EditWindow
+            windowRef={windowRefs[relativeIndex.get(windowID)!]}
+            index={editingIndex}
+            task={editingTasks[editingIndex]}
+            mousePosition={mousePosition}
+          />
+          {windows.map((window, index) => {
+            if (!window.visible || window.deleted) return null;
+            return (
+              <TaskWindow
+                ref={windowRefs[relativeIndex.get(index)!]}
+                key={window.id}
+                mousePosition={mousePosition}
+                windowId={index}
+                windowName={{
+                  get: window.name,
+                  set: (name: string) => {
+                    setWindows((prev) =>
+                      prev.map((val, i) =>
+                        i === index ? { ...val, name: name } : val
+                      )
+                    );
+                  },
+                }}
+                openTaskWindow={openTaskWindow}
+                activeIndex={windowID === index ? editingIndex : -1}
+                cancelSelection={cancelSelection}
+                minimalise={() => {
                   setWindows((prev) =>
                     prev.map((val, i) =>
-                      i === index ? { ...val, name: name } : val
+                      i === index ? { ...val, visible: false } : val
                     )
                   );
-                },
-              }}
-              openTaskWindow={openTaskWindow}
-              activeIndex={windowID === index ? editingIndex : -1}
-              cancelSelection={cancelSelection}
-              minimalise={() =>
-                setWindows((prev) =>
-                  prev.map((val, i) =>
-                    i === index ? { ...val, visible: false } : val
-                  )
-                )
-              }
-              remove={() => {
-                setWindows((prev) => {
-                  return prev.map((w, i) =>
-                    i == index ? { ...prev[i], tasks: [], deleted: true } : w
-                  );
-                });
-                localStorage.removeItem(`tasks${index}`);
-                localStorage.removeItem(`taskWindowPosition${index}`);
-              }}
-            />
-          );
-        })}
-
-        <TaskBar
-          windows={windows}
-          changeVisibility={(visible, id) => {
-            setWindows((prev) =>
-              prev.map((val, i) => {
-                if (
-                  relativeIndex.size === windowRefs.length &&
-                  i === Array.from(relativeIndex.keys())[0]
-                ) {
-                  console.log("reduce");
-                  return { ...val, visible: false };
-                }
-
-                return i === id ? { ...val, visible: visible } : val;
-              })
+                }}
+                remove={() => {
+                  setShowConfirmation(true);
+                  setDeleteWindowId(index);
+                }}
+              />
             );
-          }}
-          newWindow={() => {
-            setWindows((prev) => [
-              ...prev,
-              {
-                tasks: [],
-                name: "New window",
-                id: (prev[prev.length - 1]?.id ?? -1) + 1,
-                visible: true,
-                deleted: false,
-              },
-            ]);
-          }}
-        />
+          })}
+
+          <TaskBar
+            windows={windows}
+            changeVisibility={(visible, id) => {
+              if (visible === true) {
+                setWindows((prev) =>
+                  prev.map((val, i) => {
+                    if (
+                      relativeIndex.size === windowRefs.length &&
+                      i === Array.from(relativeIndex.keys())[0]
+                    ) {
+                      console.log("reduce");
+                      return { ...val, visible: false };
+                    }
+
+                    return i === id ? { ...val, visible: true } : val;
+                  })
+                );
+              } else {
+                windowRefs[id].current.handleMinimalise();
+              }
+            }}
+            newWindow={() => {
+              setWindows((prev) => [
+                ...prev,
+                {
+                  tasks: [],
+                  name: "New window",
+                  id: (prev[prev.length - 1]?.id ?? -1) + 1,
+                  visible: true,
+                  deleted: false,
+                },
+              ]);
+            }}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 // used for Hardcoding

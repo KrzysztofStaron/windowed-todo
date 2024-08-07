@@ -147,5 +147,60 @@ body {
 }
 
 .tasksContainer {
-  max-height: 500px;
+  max-height: 450px;
+  scrollbar-track-color: #71717a;
+}
+
+.newTaskButton {
+  width: 95%;
+}
+
+::-webkit-scrollbar {
+  width: 0.125rem;
+}
+
+::-webkit-scrollbar-track-piece {
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb:vertical {
+  @apply bg-zinc-500;
+  border-radius: 5px;
+}
+
+@keyframes scaleDown {
+  0% {
+    transform: scaleY(100%);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(0%);
+    opacity: 0;
+    display: none;
+  }
+}
+
+.minimalize {
+  animation-name: scaleDown;
+  animation-fill-mode: forwards;
+  animation-duration: 0.2s;
+  transform-origin: top left;
+}
+
+@keyframes appear {
+  0% {
+    transform: scaleY(0%);
+    opacity: 0;
+  }
+  100% {
+    transform: scaleY(100%);
+    opacity: 1;
+  }
+}
+
+.showWindow {
+  animation-name: appear;
+  animation-fill-mode: forwards;
+  animation-duration: 0.2s;
+  transform-origin: top left;
 }
