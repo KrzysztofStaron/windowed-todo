@@ -16,7 +16,12 @@ const App = () => {
   const [loading, setLoading] = useState(true);
 
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const windowRefs = [useRef(), useRef(), useRef(), useRef()];
+  const windowRefs: React.MutableRefObject<any>[] = [
+    useRef(),
+    useRef(),
+    useRef(),
+    useRef(),
+  ];
   const [windows, setWindows] = useState<TaskList[]>([]);
 
   useEffect(() => {

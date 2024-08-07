@@ -2,21 +2,15 @@
 
 import { open } from "fs/promises";
 import React, {
-  use,
   useEffect,
   useImperativeHandle,
   useReducer,
   useRef,
   useState,
 } from "react";
-import { FaCheck } from "react-icons/fa";
-import {
-  IoIosCheckmark,
-  IoMdAddCircleOutline,
-  IoMdCheckmark,
-} from "react-icons/io";
+import { IoIosCheckmark, IoMdAddCircleOutline } from "react-icons/io";
 
-const BOTTOM_MARGIN = 230;
+const BOTTOM_MARGIN = 55;
 
 export type Task = {
   name: string;
@@ -200,8 +194,10 @@ const TaskWindow = React.forwardRef(
       minimalise: CallableFunction;
       remove: CallableFunction;
     },
-    ref
+    ref: any
   ) => {
+    const windowRef = useRef<HTMLDivElement>(null);
+
     useImperativeHandle(ref, () => ({
       handleDispatch(args: any) {
         handleDispatch(args);
@@ -246,6 +242,18 @@ const TaskWindow = React.forwardRef(
     const [isDragging, setIsDragging] = useState(false);
 
     useEffect(() => {
+      const handleMouseUp = () => {
+        setIsDragging(false);
+      };
+
+      document.addEventListener("mouseup", handleMouseUp);
+
+      return () => {
+        document.removeEventListener("mouseup", handleMouseUp);
+      };
+    }, []);
+
+    useEffect(() => {
       localStorage.setItem(
         "taskWindowPosition" + windowId,
         JSON.stringify(position)
@@ -254,13 +262,19 @@ const TaskWindow = React.forwardRef(
 
     useEffect(() => {
       if (!isDragging) return;
+      const maxY =
+        window.innerHeight - BOTTOM_MARGIN - windowRef!.current!.clientHeight;
+
       setPosition({
         x: mousePosition.x + offset.x,
-        y: Math.min(
-          mousePosition.y + offset.y,
-          window.innerHeight - BOTTOM_MARGIN
-        ),
+        y: Math.min(mousePosition.y + offset.y, maxY),
       });
+      /*
+      if (mousePosition.y + offset.y > maxY) {
+        if (mousePosition.y + offset.y - maxY > 30) {
+          setIsDragging(false);
+        }
+      }*/
     }, [mousePosition]);
 
     const addTask = (task: Task) => {
@@ -269,6 +283,7 @@ const TaskWindow = React.forwardRef(
 
     return (
       <div
+        ref={windowRef}
         className="window flex flex-col fixed"
         style={{
           left: position.x,
@@ -311,7 +326,8 @@ const TaskWindow = React.forwardRef(
         </div>
 
         {/* Body + Border */}
-        <div className="flex flex-col border-zinc-800 border-x-4 border-b-4 p-2.5 rounded-b-md h-full">
+        <div className="flex flex-col border-zinc-800 border-x-4 border-b-4 p-2.5 rounded-b-md h-full tasksContainer overflow-scroll">
+          {/* Map Tasks */}
           {tasks.map((task, index) => (
             <TaskComponent
               cancelSelection={cancelSelection}

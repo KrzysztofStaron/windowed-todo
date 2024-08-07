@@ -145,3 +145,7 @@ body {
     background-color: #333333;
   }
 }
+
+.tasksContainer {
+  max-height: 500px;
+}
