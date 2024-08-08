@@ -68,7 +68,7 @@ const App = () => {
   }, [windows]);
 
   useEffect(() => {
-    let win = JSON.parse(localStorage.getItem("windows") ?? "[]") as TaskList[];
+    let win = JSON.parse(storage.getItem("windows") ?? "[]") as TaskList[];
     setWindows(win);
     setLoading(false);
   }, []);
@@ -173,8 +173,8 @@ const App = () => {
           : w
       );
     });
-    localStorage.removeItem(`tasks${deleteWindowId}`);
-    localStorage.removeItem(`taskWindowPosition${deleteWindowId}`);
+    storage.removeItem(`tasks${deleteWindowId}`);
+    storage.removeItem(`taskWindowPosition${deleteWindowId}`);
 
     setShowConfirmation(false);
   };
@@ -343,15 +343,15 @@ const EditWindow = ({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setPosition(
-      JSON.parse(localStorage.getItem("editPos") || "{}") ?? { x: 0, y: 0 }
-    );
+    if (storage.getItem("editPos")) {
+      setPosition(JSON.parse(storage.getItem("editPos")!));
+    }
     setLoading(false);
   }, []);
 
   useEffect(() => {
     if (loading === true) return;
-    localStorage.setItem("editPos", JSON.stringify(position));
+    storage.setItem("editPos", JSON.stringify(position));
   }, [position]);
 
   useEffect(() => {
