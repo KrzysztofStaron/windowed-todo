@@ -9,6 +9,16 @@ import React, {
 } from "react";
 import { IoIosCheckmark, IoMdAddCircleOutline } from "react-icons/io";
 
+import { StorageManager } from "../page";
+import {
+  FaRegTrashAlt,
+  FaRegWindowMinimize,
+  FaWindowMinimize,
+} from "react-icons/fa";
+import { HiMiniChevronDown } from "react-icons/hi2";
+import { CiSquareChevDown } from "react-icons/ci";
+import { LuTrash } from "react-icons/lu";
+
 const BOTTOM_MARGIN = 55;
 const SNAP = 10;
 
@@ -131,11 +141,14 @@ export const TaskComponent = ({
 
 export const WindowTitle = ({ editing, setEditing, windowName }: any) => {
   return (
-    <>
+    <div className="ml-1">
       <button
         className="grow text-left"
         onContextMenu={(e) => {
           e.preventDefault();
+          setEditing(true);
+        }}
+        onDoubleClick={(e) => {
           setEditing(true);
         }}
         onKeyDown={(e) => {
@@ -148,7 +161,7 @@ export const WindowTitle = ({ editing, setEditing, windowName }: any) => {
           <>
             <input
               type="text"
-              className="font-bold w-full bg-transparent h-7 outline-none truncate overflow-hidden"
+              className="font-bold w-full bg-transparent h-full outline-none truncate overflow-hidden"
               value={windowName.get}
               onChange={(e) => windowName.set(e.target.value.replace(/:$/, ""))}
               onBlur={() => setEditing(false)}
@@ -161,7 +174,7 @@ export const WindowTitle = ({ editing, setEditing, windowName }: any) => {
           </p>
         )}
       </button>
-    </>
+    </div>
   );
 };
 
@@ -180,6 +193,7 @@ const TaskWindow = React.forwardRef(
       cancelSelection,
       minimalise,
       remove,
+      storage,
     }: {
       windowId: number;
       mousePosition: { x: number; y: number };
@@ -189,6 +203,7 @@ const TaskWindow = React.forwardRef(
       cancelSelection: CallableFunction;
       minimalise: CallableFunction;
       remove: CallableFunction;
+      storage: StorageManager;
     },
     ref: any
   ) => {
@@ -224,17 +239,17 @@ const TaskWindow = React.forwardRef(
 
     const [tasks, tasksDispatch] = useReducer(
       tasksReducer,
-      JSON.parse(localStorage.getItem("tasks" + windowId)!) ?? []
+      JSON.parse(storage.getItem("tasks" + windowId)!) ?? []
     );
 
     useEffect(() => {
-      localStorage.setItem("tasks" + windowId, JSON.stringify(tasks));
+      storage.setItem("tasks" + windowId, JSON.stringify(tasks));
     }, [tasks]);
 
     const [offset, setOffset] = useState({ x: 0, y: 0 });
 
     const [position, setPosition] = useState(
-      JSON.parse(localStorage.getItem("taskWindowPosition" + windowId)!) ?? {
+      JSON.parse(storage.getItem("taskWindowPosition" + windowId)!) ?? {
         x: 0,
         y: 0,
       }
@@ -259,7 +274,7 @@ const TaskWindow = React.forwardRef(
     }, []);
 
     useEffect(() => {
-      localStorage.setItem(
+      storage.setItem(
         "taskWindowPosition" + windowId,
         JSON.stringify(position)
       );
@@ -309,7 +324,7 @@ const TaskWindow = React.forwardRef(
       >
         {/* Header */}
         <div
-          className="text-white bg-zinc-800 h-6 flex items-center justify-between px-2 rounded-t-md cursor-grab w-full gap-4 "
+          className="text-white bg-zinc-800 h-8 flex items-center justify-between px-2 rounded-t-md cursor-grab w-full gap-4 "
           onMouseDown={(e) => {
             if (!editing) {
               setOffset({
@@ -331,13 +346,17 @@ const TaskWindow = React.forwardRef(
 
           <div className="flex gap-1.5">
             <button
-              className="rounded-full bg-yellow-400 h-3.5 w-3.5"
+              className="bg-yellow-400 winButton rounded-full flex items-center justify-center text-yellow-950"
               onClick={() => handleMinimalise()}
-            ></button>
+            >
+              <FaRegWindowMinimize size={10} />
+            </button>
             <button
-              className="rounded-full bg-red-500 h-3.5 w-3.5"
+              className="bg-red-500 flex items-center justify-center winButton rounded-full text-red-950"
               onClick={() => remove()}
-            ></button>
+            >
+              <LuTrash className="icon" size={14} />
+            </button>
           </div>
         </div>
 

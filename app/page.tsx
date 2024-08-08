@@ -17,18 +17,26 @@ export type TaskList = {
   deleted: boolean;
 };
 
-class StorageManager {
+export class StorageManager {
+  useDb: boolean;
+  constructor(useDb: boolean = false) {
+    this.useDb = useDb;
+  }
   setItem(key: string, value: any) {
-    console.log("Set Item");
     localStorage.setItem(key, value);
   }
   getItem(key: string) {
-    console.log("Get Item");
-    return localStorage.getItem(key);
+    if (this.useDb) {
+      return localStorage.getItem(key);
+    } else {
+      return localStorage.getItem(key);
+    }
   }
   removeItem(key: string) {
-    console.log("Remove Item");
-    localStorage.removeItem(key);
+    if (this.useDb) {
+    } else {
+      localStorage.removeItem(key);
+    }
   }
 }
 
@@ -128,7 +136,7 @@ const App = () => {
     let ret = new Map<number, number>();
 
     for (let i = 0; i < windows.length; i++) {
-      if (windows[i].visible) {
+      if (windows[i].visible && !windows[i].deleted) {
         ret.set(i, ret.size);
       }
     }
@@ -163,7 +171,7 @@ const App = () => {
     setWindows((prev) => {
       return prev.map((w, i) =>
         i == deleteWindowId
-          ? { ...prev[i], name: "", tasks: [], deleted: true }
+          ? { ...prev[i], name: "", tasks: [], deleted: true, visible: false }
           : w
       );
     });
@@ -179,7 +187,7 @@ const App = () => {
         <div className="w-screen h-screen flex items-center justify-center absolute z-50 bg-opacity-60 bg-black">
           <div className="bg-zinc-800 text-white p-4 rounded-md">
             <h1 className="text-lg mb-4 font-semibold">
-              Are you sure you want to delete this task?
+              Are you sure you want to delete it?
             </h1>
             <div className="flex gap-4 justify-center">
               <button
@@ -247,6 +255,7 @@ const App = () => {
                   setShowConfirmation(true);
                   setDeleteWindowId(index);
                 }}
+                storage={storage}
               />
             );
           })}
@@ -337,7 +346,7 @@ const EditWindow = ({
 
   useEffect(() => {
     setPosition(
-      JSON.parse(localStorage.getItem("editPos") ?? "") ?? { x: 0, y: 0 }
+      JSON.parse(localStorage.getItem("editPos") || "{}") ?? { x: 0, y: 0 }
     );
     setLoading(false);
   }, []);
