@@ -1,9 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import TaskWindow, { Task, TaskActions, WindowTitle } from "./TaskWindow";
+import TaskWindow, {
+  Task,
+  TaskActions,
+  WindowTitle,
+} from "./components/TaskWindow";
 import { FaRegTrashAlt } from "react-icons/fa";
-import TaskBar from "./TaskBar";
+import { LuUndo2 } from "react-icons/lu";
+import TaskBar from "./components/TaskBar";
 
 export type TaskList = {
   name: string;
@@ -261,6 +266,16 @@ const App = () => {
           />
         </div>
       </div>
+      <div className=" absolute right-1 top-1">
+        <button
+          className="w-8 h-8 text-3xl flex items-center justify-center text-white hover:text-zinc-400"
+          onClick={() => {
+            console.log("undo");
+          }}
+        >
+          <LuUndo2 />
+        </button>
+      </div>
     </>
   );
 };
@@ -323,7 +338,7 @@ const EditWindow = ({
     windowRef.current.handleDispatch({
       type: TaskActions.UPDATE,
       index: index,
-      payload: { name: name, done: false, color: color },
+      payload: { name: name, color: color },
     });
   }, [name, color]);
 

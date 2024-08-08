@@ -48,7 +48,7 @@ const tasksReducer = (
     case TaskActions.UPDATE:
       return state.map((task, index) => {
         if (index === action.index) {
-          return action.payload;
+          return { ...task, ...action.payload };
         }
         return task;
       });
