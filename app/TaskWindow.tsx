@@ -214,7 +214,6 @@ const TaskWindow = React.forwardRef(
     const handleDispatch = function (args: any) {
       tasksDispatch(args);
       if (args.type === TaskActions.REMOVE) {
-        console.log(tasks);
         openTaskWindow(
           tasks.filter((_, index) => index !== args.index),
           args.index,
@@ -291,7 +290,7 @@ const TaskWindow = React.forwardRef(
     return (
       <div
         ref={windowRef}
-        className="window flex flex-col fixed showWindow"
+        className="window flex flex-col fixed showWindow bg-black"
         style={{
           left: position.x,
           top: Math.min(window.innerHeight - BOTTOM_MARGIN, position.y),
@@ -335,7 +334,11 @@ const TaskWindow = React.forwardRef(
         {/* Body + Border */}
         <div className="flex flex-col border-zinc-800 border-x-4 border-b-4 rounded-b-md h-full pb-2.5 items-center">
           {/* Map Tasks */}
-          <div className="flex flex-col tasksContainer overflow-scroll gap-3 px-2.5 mb-2.5 mt-2.5 overflow-x-hidden">
+          <div
+            className={`flex flex-col tasksContainer overflow-scroll gap-3 px-2.5 mb-2.5 ${
+              tasks.length != 0 ? "mt-2.5" : ""
+            } overflow-x-hidden`}
+          >
             {tasks.map((task, index) => (
               <TaskComponent
                 cancelSelection={cancelSelection}

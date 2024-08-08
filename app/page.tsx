@@ -40,9 +40,7 @@ const App = () => {
   }, [windows]);
 
   useEffect(() => {
-    let win = JSON.parse(localStorage.getItem("windows") ?? "[]").filter(
-      (e: any) => !e.deleted
-    );
+    let win = JSON.parse(localStorage.getItem("windows") ?? "[]") as TaskList[];
     setWindows(win);
     setLoading(false);
   }, []);
@@ -62,6 +60,22 @@ const App = () => {
       )}`
     );
   };
+
+  useEffect(() => {
+    if (loading) return;
+
+    let found = false;
+    for (let w of windows) {
+      if (w.deleted === false) {
+        found = true;
+        break;
+      }
+    }
+
+    if (found === false) {
+      localStorage.clear();
+    }
+  }, [windows]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -126,7 +140,9 @@ const App = () => {
   const handleConfirm = () => {
     setWindows((prev) => {
       return prev.map((w, i) =>
-        i == deleteWindowId ? { ...prev[i], tasks: [], deleted: true } : w
+        i == deleteWindowId
+          ? { ...prev[i], name: "", tasks: [], deleted: true }
+          : w
       );
     });
     localStorage.removeItem(`tasks${deleteWindowId}`);
@@ -146,11 +162,7 @@ const App = () => {
             <div className="flex gap-4 justify-center">
               <button
                 className="bg-red-500 hover:bg-red-400 text-white px-4 py-1 rounded-md"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    handleConfirm();
-                  }
-                }}
+                autoFocus
                 onClick={() => {
                   handleConfirm();
                 }}
@@ -220,23 +232,19 @@ const App = () => {
           <TaskBar
             windows={windows}
             changeVisibility={(visible, id) => {
-              if (visible === true) {
-                setWindows((prev) =>
-                  prev.map((val, i) => {
-                    if (
-                      relativeIndex.size === windowRefs.length &&
-                      i === Array.from(relativeIndex.keys())[0]
-                    ) {
-                      console.log("reduce");
-                      return { ...val, visible: false };
-                    }
+              setWindows((prev) =>
+                prev.map((val, i) => {
+                  if (
+                    relativeIndex.size === windowRefs.length &&
+                    i === Array.from(relativeIndex.keys())[0]
+                  ) {
+                    console.log("reduce");
+                    return { ...val, visible: false };
+                  }
 
-                    return i === id ? { ...val, visible: true } : val;
-                  })
-                );
-              } else {
-                windowRefs[id].current.handleMinimalise();
-              }
+                  return i === id ? { ...val, visible: visible } : val;
+                })
+              );
             }}
             newWindow={() => {
               setWindows((prev) => [
