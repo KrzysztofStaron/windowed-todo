@@ -10,13 +10,7 @@ import React, {
 import { IoIosCheckmark, IoMdAddCircleOutline } from "react-icons/io";
 
 import { StorageManager } from "../page";
-import {
-  FaRegTrashAlt,
-  FaRegWindowMinimize,
-  FaWindowMinimize,
-} from "react-icons/fa";
-import { HiMiniChevronDown } from "react-icons/hi2";
-import { CiSquareChevDown } from "react-icons/ci";
+import { FaRegWindowMinimize } from "react-icons/fa";
 import { LuTrash } from "react-icons/lu";
 
 const BOTTOM_MARGIN = 55;
@@ -160,6 +154,7 @@ export const WindowTitle = ({ editing, setEditing, windowName }: any) => {
         {editing ? (
           <>
             <input
+              maxLength={22}
               type="text"
               className="font-bold w-full bg-transparent h-full outline-none truncate overflow-hidden"
               value={windowName.get}
