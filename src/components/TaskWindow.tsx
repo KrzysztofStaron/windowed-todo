@@ -9,9 +9,6 @@ import React, {
 } from "react";
 import { IoIosCheckmark, IoMdAddCircleOutline } from "react-icons/io";
 
-import { FaRegWindowMinimize } from "react-icons/fa";
-import { LuTrash } from "react-icons/lu";
-
 const BOTTOM_MARGIN = 55;
 const SNAP = 10;
 
@@ -88,7 +85,7 @@ export const TaskComponent = ({
       } transition-all rounded-lg border-2 gap-2 p-1 justify-between ${
         task.done || isDragging || `${task.color}`
       } ${task.done ? "order-2 opacity-80" : "order-1"}`}
-      onDoubleClick={(e) => {
+      onDoubleClick={() => {
         if (!task.done) {
           dispatch({ type: TaskActions.STATUS, payload: index });
         }
@@ -141,7 +138,7 @@ export const WindowTitle = ({ editing, setEditing, windowName }: any) => {
           e.preventDefault();
           setEditing(true);
         }}
-        onDoubleClick={(e) => {
+        onDoubleClick={() => {
           setEditing(true);
         }}
         onKeyDown={(e) => {
@@ -328,7 +325,7 @@ const TaskWindow = React.forwardRef(
               setIsDragging(true);
             }
           }}
-          onMouseUp={(e) => {
+          onMouseUp={() => {
             setIsDragging(false);
           }}
         >
@@ -378,7 +375,7 @@ const TaskWindow = React.forwardRef(
 
           <div
             className="h-8 rounded-lg bg-zinc-800 flex items-center justify-center text-white text-2xl hover:bg-zinc-700 cursor-pointer order-4 newTaskButton"
-            onClick={(e) => {
+            onClick={() => {
               addTask(createTask("New Task", "white"));
               openTaskWindow(
                 [...tasks, createTask("New Task", "white")],
