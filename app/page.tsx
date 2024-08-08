@@ -237,19 +237,33 @@ const App = () => {
           <TaskBar
             windows={windows}
             changeVisibility={(visible, id) => {
-              setWindows((prev) =>
-                prev.map((val, i) => {
-                  if (
-                    relativeIndex.size === windowRefs.length &&
-                    i === Array.from(relativeIndex.keys())[0]
-                  ) {
-                    console.log("reduce");
-                    return { ...val, visible: false };
-                  }
+              if (visible === false) {
+                const el = document.querySelector(`.window${id}`);
+                el?.classList.remove("showWindow");
+                el?.classList.add("minimalize");
 
-                  return i === id ? { ...val, visible: visible } : val;
-                })
-              );
+                setTimeout(() => {
+                  setWindows((prev) =>
+                    prev.map((val, i) => {
+                      return i === id ? { ...val, visible: false } : val;
+                    })
+                  );
+                }, 200);
+              } else {
+                setWindows((prev) =>
+                  prev.map((val, i) => {
+                    if (
+                      relativeIndex.size === windowRefs.length &&
+                      i === Array.from(relativeIndex.keys())[0]
+                    ) {
+                      console.log("reduce");
+                      return { ...val, visible: false };
+                    }
+
+                    return i === id ? { ...val, visible: visible } : val;
+                  })
+                );
+              }
             }}
             newWindow={() => {
               setWindows((prev) => [

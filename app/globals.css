@@ -93,10 +93,10 @@ button.red {
 }
 
 .blue_h {
-  @apply bg-blue-200;
+  @apply bg-blue-300;
 }
 .red_h {
-  @apply bg-red-200;
+  @apply bg-red-300;
 }
 
 .white:hover {

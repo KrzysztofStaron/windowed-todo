@@ -290,7 +290,7 @@ const TaskWindow = React.forwardRef(
     return (
       <div
         ref={windowRef}
-        className="window flex flex-col fixed showWindow bg-black"
+        className={`window flex flex-col fixed showWindow bg-black window${windowId}`}
         style={{
           left: position.x,
           top: Math.min(window.innerHeight - BOTTOM_MARGIN, position.y),

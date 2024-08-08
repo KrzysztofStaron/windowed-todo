@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { TaskList } from "./page";
+import { TaskList } from "../page";
 import { HiOutlinePlus } from "react-icons/hi";
 
 type TaskBarApp = {
