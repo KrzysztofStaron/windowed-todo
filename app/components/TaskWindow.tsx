@@ -1,6 +1,5 @@
 "use client";
 
-import { open } from "fs/promises";
 import React, {
   useEffect,
   useImperativeHandle,
@@ -11,6 +10,7 @@ import React, {
 import { IoIosCheckmark, IoMdAddCircleOutline } from "react-icons/io";
 
 const BOTTOM_MARGIN = 55;
+const SNAP = 10;
 
 export type Task = {
   name: string;
@@ -103,7 +103,7 @@ export const TaskComponent = ({
       }}
     >
       <p
-        className={`w-80 text-center transition-all font-bold mx-1 ${
+        className={`w-80 text-left transition-all font-bold mx-2 ${
           task.done ? "text-zinc-500" : "text-white"
         }`}
         style={{ userSelect: "none" }}
@@ -115,7 +115,7 @@ export const TaskComponent = ({
         onClick={() => {
           dispatch({ type: TaskActions.STATUS, payload: index });
         }}
-        className={`flex items-center justify-center transition-all text-black h-5 w-5  ${
+        className={`flex items-center justify-center transition-all text-black h-5 w-5 mr-1  ${
           task.done
             ? `${task.color} rounded-md`
             : `bg-white rounded-sm ${task.color}_h`
@@ -148,7 +148,7 @@ export const WindowTitle = ({ editing, setEditing, windowName }: any) => {
           <>
             <input
               type="text"
-              className="font-bold w-full bg-transparent h-6 outline-none truncate overflow-hidden"
+              className="font-bold w-full bg-transparent h-7 outline-none truncate overflow-hidden"
               value={windowName.get}
               onChange={(e) => windowName.set(e.target.value.replace(/:$/, ""))}
               onBlur={() => setEditing(false)}
@@ -233,21 +233,20 @@ const TaskWindow = React.forwardRef(
 
     const [offset, setOffset] = useState({ x: 0, y: 0 });
 
-    const [position, setPosition] = useState(() => {
-      if (localStorage.getItem("taskWindowPosition" + windowId)) {
-        return JSON.parse(
-          localStorage.getItem("taskWindowPosition" + windowId)!
-        );
-      } else {
-        return { x: 0, y: 0 };
+    const [position, setPosition] = useState(
+      JSON.parse(localStorage.getItem("taskWindowPosition" + windowId)!) ?? {
+        x: 0,
+        y: 0,
       }
-    });
+    );
 
     const [editing, setEditing] = useState(false);
 
     const [isDragging, setIsDragging] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+      setLoading(false);
       const handleMouseUp = () => {
         setIsDragging(false);
       };
@@ -282,6 +281,17 @@ const TaskWindow = React.forwardRef(
         }
       }*/
     }, [mousePosition]);
+
+    useEffect(() => {
+      if (loading) return;
+      const maxY =
+        window.innerHeight - BOTTOM_MARGIN - windowRef!.current!.clientHeight;
+
+      setPosition({
+        x: Math.round((mousePosition.x + offset.x) / SNAP) * SNAP,
+        y: Math.round(Math.min(mousePosition.y + offset.y, maxY) / SNAP) * SNAP,
+      });
+    }, [isDragging]);
 
     const addTask = (task: Task) => {
       tasksDispatch({ type: TaskActions.ADD, payload: task });

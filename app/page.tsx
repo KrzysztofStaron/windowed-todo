@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { use, useEffect, useMemo, useRef, useState } from "react";
 import TaskWindow, {
   Task,
   TaskActions,
@@ -16,6 +16,23 @@ export type TaskList = {
   visible: boolean;
   deleted: boolean;
 };
+
+class StorageManager {
+  setItem(key: string, value: any) {
+    console.log("Set Item");
+    localStorage.setItem(key, value);
+  }
+  getItem(key: string) {
+    console.log("Get Item");
+    return localStorage.getItem(key);
+  }
+  removeItem(key: string) {
+    console.log("Remove Item");
+    localStorage.removeItem(key);
+  }
+}
+
+const storage = new StorageManager();
 
 const App = () => {
   const [windows, setWindows] = useState<TaskList[]>([]);
@@ -41,7 +58,7 @@ const App = () => {
 
   useEffect(() => {
     if (loading) return;
-    localStorage.setItem("windows", JSON.stringify(windows));
+    storage.setItem("windows", JSON.stringify(windows));
   }, [windows]);
 
   useEffect(() => {
@@ -315,15 +332,18 @@ const EditWindow = ({
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
 
-  const [position, setPosition] = useState(() => {
-    if (localStorage.getItem("editPos")) {
-      return JSON.parse(localStorage.getItem("editPos")!);
-    } else {
-      return { x: 0, y: 0 };
-    }
-  });
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setPosition(
+      JSON.parse(localStorage.getItem("editPos") ?? "") ?? { x: 0, y: 0 }
+    );
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (loading === true) return;
     localStorage.setItem("editPos", JSON.stringify(position));
   }, [position]);
 
@@ -356,9 +376,11 @@ const EditWindow = ({
     });
   }, [name, color]);
 
+  if (loading) return null;
+
   return (
     <div
-      className="flex flex-col fixed"
+      className="flex flex-col fixed showWindow"
       style={{ height: 350, width: 350, left: position.x, top: position.y }}
     >
       {/* Header */}
