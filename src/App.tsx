@@ -1,6 +1,4 @@
-"use client";
-
-import { use, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import TaskWindow, {
   Task,
   TaskActions,
@@ -406,14 +404,14 @@ const EditWindow = ({
           });
           setIsDragging(true);
         }}
-        onMouseUp={(e) => {
+        onMouseUp={() => {
           setIsDragging(false);
         }}
       >
         <WindowTitle
           editing={false}
           setEditing={() => {}}
-          windowName={{ get: "Manage Task", set: (v: string) => {} }}
+          windowName={{ get: "Manage Task", set: () => {} }}
           setWindowName={() => {}}
         />
       </div>

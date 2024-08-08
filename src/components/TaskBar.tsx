@@ -1,7 +1,4 @@
-"use client";
-
-import React, { useEffect, useState } from "react";
-import { TaskList } from "../page";
+import { TaskList } from "../App";
 import { HiOutlinePlus } from "react-icons/hi";
 
 type TaskBarApp = {
@@ -25,7 +22,7 @@ const TaskBarApp = ({
           ? " bg-zinc-800 text-gray-100 taskBarApp"
           : "taskBarAppClosed text-gray-400"
       } h-9 flex items-center justify-center hover:text-white px-4 min-w-28 font-bold rounded-lg`}
-      onClick={(e) => changeVisibility(!visible, app.id)}
+      onClick={() => changeVisibility(!visible, app.id)}
     >
       {app.name}
     </button>
@@ -57,7 +54,7 @@ const TaskBar = ({
       <button
         className={`
          bg-zinc-800 text-gray-100 taskBarApp h-9 flex items-center justify-center hover:text-white w-9 font-bold rounded-lg `}
-        onClick={(e) => newWindow()}
+        onClick={() => newWindow()}
       >
         <HiOutlinePlus />
       </button>

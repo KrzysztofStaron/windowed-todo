@@ -9,7 +9,6 @@ import React, {
 } from "react";
 import { IoIosCheckmark, IoMdAddCircleOutline } from "react-icons/io";
 
-import { StorageManager } from "../page";
 import { FaRegWindowMinimize } from "react-icons/fa";
 import { LuTrash } from "react-icons/lu";
 
@@ -107,7 +106,7 @@ export const TaskComponent = ({
       }}
     >
       <p
-        className={`w-80 text-left transition-all font-bold mx-2 ${
+        className={`w-80 text-left transition-all font-semibold mx-2 ${
           task.done ? "text-zinc-500" : "text-white"
         }`}
         style={{ userSelect: "none" }}
@@ -156,7 +155,7 @@ export const WindowTitle = ({ editing, setEditing, windowName }: any) => {
             <input
               maxLength={22}
               type="text"
-              className="font-bold w-full bg-transparent h-full outline-none truncate overflow-hidden"
+              className="font-semibold w-full bg-transparent h-full outline-none truncate overflow-hidden"
               value={windowName.get}
               onChange={(e) => windowName.set(e.target.value.replace(/:$/, ""))}
               onBlur={() => setEditing(false)}
@@ -164,7 +163,7 @@ export const WindowTitle = ({ editing, setEditing, windowName }: any) => {
             />
           </>
         ) : (
-          <p className="font-bold" style={{ userSelect: "none" }}>
+          <p className="font-semibold" style={{ userSelect: "none" }}>
             {windowName.get + ":"}
           </p>
         )}
@@ -198,7 +197,7 @@ const TaskWindow = React.forwardRef(
       cancelSelection: CallableFunction;
       minimalise: CallableFunction;
       remove: CallableFunction;
-      storage: StorageManager;
+      storage: any;
     },
     ref: any
   ) => {
@@ -319,7 +318,7 @@ const TaskWindow = React.forwardRef(
       >
         {/* Header */}
         <div
-          className="text-white bg-zinc-800 h-8 flex items-center justify-between px-2 rounded-t-md cursor-grab w-full gap-4 "
+          className="text-white bg-zinc-800 h-9 flex items-center justify-between px-2 rounded-t-md cursor-grab w-full gap-4"
           onMouseDown={(e) => {
             if (!editing) {
               setOffset({
@@ -333,25 +332,23 @@ const TaskWindow = React.forwardRef(
             setIsDragging(false);
           }}
         >
-          <WindowTitle
-            editing={editing}
-            setEditing={setEditing}
-            windowName={windowName}
-          />
+          <div className="pb-1">
+            <WindowTitle
+              editing={editing}
+              setEditing={setEditing}
+              windowName={windowName}
+            />
+          </div>
 
           <div className="flex gap-1.5">
             <button
-              className="bg-yellow-400 winButton rounded-full flex items-center justify-center text-yellow-950"
+              className="bg-yellow-400 winButton rounded-full flex items-center justify-center text-yellow-950 w-4 h-4"
               onClick={() => handleMinimalise()}
-            >
-              <FaRegWindowMinimize size={10} />
-            </button>
+            ></button>
             <button
-              className="bg-red-500 flex items-center justify-center winButton rounded-full text-red-950"
+              className="bg-red-500 flex items-center justify-center winButton rounded-full text-red-950 w-4 h-4"
               onClick={() => remove()}
-            >
-              <LuTrash className="icon" size={14} />
-            </button>
+            ></button>
           </div>
         </div>
 

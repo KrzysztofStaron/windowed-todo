@@ -204,12 +204,3 @@ body {
   animation-duration: 0.2s;
   transform-origin: top left;
 }
-
-.winButton {
-  width: 20px;
-  height: 20px;
-}
-
-.icon {
-  stroke-width: 3;
-}
