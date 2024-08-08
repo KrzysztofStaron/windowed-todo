@@ -385,6 +385,10 @@ const EditWindow = ({
     });
   }, [name, color]);
 
+  useEffect(() => {
+    (document.querySelector(".inputName") as HTMLInputElement)?.focus();
+  }, [task]);
+
   if (loading) return null;
 
   return (
@@ -425,7 +429,7 @@ const EditWindow = ({
               <label className="text-white">Name: </label>
               <input
                 type="text"
-                className="text-black w-11/12 text-center font-bold focus:outline-none"
+                className="text-black w-11/12 text-center font-bold focus:outline-none inputName"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
