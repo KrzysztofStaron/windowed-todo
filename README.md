@@ -2,9 +2,6 @@
 
 This project is a task management application built using React + TypeScript + Tailwind. It allows users to create, edit, and manage tasks within multiple windows. The application features a dynamic taskbar, draggable task windows, and persistent state management using local storage.
 
-![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white) 
-![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB) 
-![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![Cool](/screenshots/windows.png)
 
 ###### Check It by yourself:
@@ -86,3 +83,7 @@ The EditWindow component is responsible for rendering the task editing interface
 - `index`: Index of the task being edited.
 - `mousePosition`: Current mouse position.
 - `windowId`: ID of the window containing the task.
+
+![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white) 
+![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB) 
+![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
