@@ -1,0 +1,206 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+.checkBox {
+  width: 0.75rem;
+  height: 0.75rem;
+  background-color: white;
+  border: 1px solid;
+  @apply border-zinc-950;
+  color: black;
+  transition: all 0.3s ease;
+}
+
+.checkBox:hover {
+  @apply bg-gray-400;
+}
+
+.checkBox.active {
+  @apply bg-yellow-500;
+  transition: all 0.5s ease;
+}
+
+.checkBox.active:hover {
+  @apply bg-yellow-400;
+}
+ 
+
+p:hover {
+  color: black;
+  animation: pulse 1s alternate;
+}
+
+@keyframes pulse {
+  0% {
+    color: orange;
+  }
+  100% {
+    color: black;
+  }
+}
+ */
+
+.wrapper {
+  background: linear-gradient(#fbbf24, #fde047),
+    linear-gradient(to right, #fbbf24, #fde047);
+  background-origin: padding-box, border-box;
+  background-repeat: no-repeat; /* this is important */
+  border: 2px solid transparent;
+  border-radius: 0.25rem;
+  width: fit-content;
+}
+
+.window {
+  height: fit-content;
+}
+
+.task {
+  border-color: transparent;
+}
+
+.blue:hover {
+  @apply border-cyan-400;
+}
+
+.red:hover {
+  @apply border-red-500;
+}
+
+.yellow:hover {
+  @apply border-yellow-400;
+}
+
+button.blue {
+  @apply bg-cyan-400;
+}
+
+button.yellow {
+  @apply bg-yellow-300;
+}
+
+button.white {
+  @apply bg-white;
+}
+
+button.red {
+  @apply bg-red-500;
+}
+
+.yellow_h {
+  @apply bg-yellow-200;
+}
+
+.blue_h {
+  @apply bg-blue-300;
+}
+.red_h {
+  @apply bg-red-300;
+}
+
+.white:hover {
+  @apply border-white;
+}
+
+body {
+  background: linear-gradient(#09090b, #030712);
+}
+
+.taskBarApp:hover {
+  background-color: #333333;
+}
+
+.taskBarAppClosed {
+  background-color: #1f1f21;
+  animation-name: pulseUp;
+  animation-duration: 0.4s;
+}
+
+@keyframes pulseUp {
+  0% {
+    background-color: #27272a;
+  }
+  10% {
+    background-color: #3f3f46;
+  }
+  100% {
+    background-color: #1f1f21;
+  }
+}
+
+.taskBarApp {
+  animation-name: pulseDown;
+  animation-duration: 0.2s;
+}
+
+@keyframes pulseDown {
+  0% {
+    background-color: #1f1f21;
+  }
+  10% {
+    background-color: black;
+  }
+  100% {
+    background-color: #333333;
+  }
+}
+
+.tasksContainer {
+  max-height: 450px;
+  scrollbar-track-color: #71717a;
+}
+
+.newTaskButton {
+  width: 95%;
+}
+
+::-webkit-scrollbar {
+  width: 0.125rem;
+}
+
+::-webkit-scrollbar-track-piece {
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb:vertical {
+  @apply bg-zinc-500;
+  border-radius: 5px;
+}
+
+@keyframes scaleDown {
+  0% {
+    transform: scaleY(100%);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleY(0%);
+    opacity: 0;
+    display: none;
+  }
+}
+
+.minimalize {
+  animation-name: scaleDown;
+  animation-fill-mode: forwards;
+  animation-duration: 0.2s;
+  transform-origin: top left;
+}
+
+@keyframes appear {
+  0% {
+    transform: scaleY(0%);
+    opacity: 0;
+  }
+  100% {
+    transform: scaleY(100%);
+    opacity: 1;
+  }
+}
+
+.showWindow {
+  animation-name: appear;
+  animation-fill-mode: forwards;
+  animation-duration: 0.2s;
+  transform-origin: top left;
+}
